@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model, Types } from "mongoose";
 
 export interface IVendor extends Document {
+  _id: Types.ObjectId;  // Pastikan `_id` dideklarasikan dengan tipe ObjectId
   name: string;
   email: string;
   description: string;

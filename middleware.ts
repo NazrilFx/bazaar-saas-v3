@@ -11,7 +11,7 @@ interface RoleConfig {
 const roleConfig: RoleConfig = {
   "/admin": { tokenName: "admin_token", loginUrl: "/login-admin" },
   "/vendor": { tokenName: "vendor_token", loginUrl: "/login-vendor" },
-  "/store": { tokenName: "store_token", loginUrl: "/store/login" },
+  "/store": { tokenName: "store_token", loginUrl: "/login-store" },
   "/pos": { tokenName: "user_token", loginUrl: "/login" },
 };
 

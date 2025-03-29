@@ -17,7 +17,7 @@ export default function LoginPage() {
       const data = await res.json();
   
       if (data.user) {
-        router.push("/pos");
+        router.push("/vendor");
       }
     };
   

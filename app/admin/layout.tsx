@@ -64,7 +64,7 @@ interface Admin {
 export default function AdminLayout({children,}: Readonly<{children: React.ReactNode;
 }>) {
   const [admin, setAdmin] = useState<Admin | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<Boolean>(true);
 
   useEffect(() => {
     const fetchUser = async () => {

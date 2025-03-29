@@ -1,15 +1,57 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AdminVendorsList } from "@/components/admin/vendors-list"
-import { Filter, Plus, Search } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdminVendorsList } from "@/components/admin/vendors-list";
+import { Filter, Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
-export default function handleRedirect() {
-  const router = useRouter()
+interface Ivendor {
+  name: string;
+  email: string;
+  description: string;
+  phone: string;
+  profile_image: string;
+  business_type: string;
+  contact_name: string;
+  password_hash: string;
+  verified: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export default function VendorManagement() {
+  const router = useRouter();
+  const [csrfToken, setCsrfToken] = useState("");
+  const [InactiveVendor, setInactiveVendor] = useState<Ivendor[] | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await fetch("/api/admin/dashboard"); // Fetch dari API Next.js
+      const data = await res.json();
+
+      if (res.ok) {
+        setInactiveVendor(data.inactiveVendors);
+      } else {
+        setInactiveVendor(null);
+      }
+    };
+
+    fetch("/api/csrf")
+      .then((res) => res.json())
+      .then((data) => setCsrfToken(data.csrfToken));
+
+    fetchUser();
+  }, []);
 
   const handleRedirect = () => {
     router.push("/signup-vendor"); // Berfungsi di App Router
@@ -18,8 +60,12 @@ export default function handleRedirect() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Vendor Management</h2>
-          <p className="text-muted-foreground">Manage vendor accounts and applications</p>
+          <h2 className="text-2xl font-bold tracking-tight">
+            Vendor Management
+          </h2>
+          <p className="text-muted-foreground">
+            Manage vendor accounts and applications
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={handleRedirect}>
@@ -34,12 +80,18 @@ export default function handleRedirect() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <CardTitle>Vendors</CardTitle>
-              <CardDescription>View and manage all vendors in your system</CardDescription>
+              <CardDescription>
+                View and manage all vendors in your system
+              </CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input type="search" placeholder="Search vendors..." className="pl-8 w-[200px] md:w-[300px]" />
+                <Input
+                  type="search"
+                  placeholder="Search vendors..."
+                  className="pl-8 w-[200px] md:w-[300px]"
+                />
               </div>
               <Button variant="outline" size="icon">
                 <Filter className="h-4 w-4" />
@@ -67,6 +119,5 @@ export default function handleRedirect() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-

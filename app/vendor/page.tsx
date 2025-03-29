@@ -1,11 +1,16 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowUpRight, CalendarDays, CreditCard, DollarSign, Plus, ShoppingBag, Store } from "lucide-react"
 import { VendorStoresList } from "@/components/vendor/stores-list"
 import { VendorEventsList } from "@/components/vendor/events-list"
+import { useRouter } from "next/navigation"
 
 export default function VendorDashboard() {
+  const router = useRouter()
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -14,7 +19,7 @@ export default function VendorDashboard() {
           <p className="text-muted-foreground">Manage your stores and bazaar participation</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button>
+          <Button onClick={() => {router.push("/signup-store")}}>
             <Plus className="mr-2 h-4 w-4" />
             Register New Store
           </Button>

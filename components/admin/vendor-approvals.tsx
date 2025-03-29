@@ -28,6 +28,7 @@ interface AdminVendorApprovalsProps {
 
 export function AdminVendorApprovals({ vendors }: AdminVendorApprovalsProps) {
   const [email, setEmail] = useState("");
+  const [csrfToken, setCsrfToken] = useState("");
 
   const reject = async () => {
     try {

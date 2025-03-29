@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "@/models/User";
+import Store from "@/models/Store";
 import connectDB from "@/lib/dbConnect";
 
 export function getCookieToken(req: Request, cookieName: string) {
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
     // Ambil token CSRF dari cookie dan request body
     const csrfTokenFromCookie = getCookieToken(req, "csrf_token");
-    const { email, password, csrfToken } = await req.json(); // Gunakan nama yang lebih standar
+    const { name, password, csrfToken } = await req.json(); // Gunakan nama yang lebih standar
 
     // Perbaiki validasi CSRF token
     if (!csrfTokenFromCookie || !csrfToken || csrfTokenFromCookie !== csrfToken) {
@@ -23,27 +23,27 @@ export async function POST(req: Request) {
     }
 
     // Cek apakah user ada di database
-    const user = await User.findOne({ email });
-    if (!user) {
+    const store = await Store.findOne({ name });
+    if (!store) {
       return NextResponse.json({ message: "Invalid email or password" }, { status: 401 });
     }
 
     // Bandingkan password dengan hash di database
-    const isMatch = await bcrypt.compare(password, user.password_hash);
+    const isMatch = await bcrypt.compare(password, store.password_hash);
     if (!isMatch) {
       return NextResponse.json({ message: "Invalid email or password" }, { status: 401 });
     }
 
     // Buat token JWT
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      { id: store._id, name: store.name },
       process.env.JWT_SECRET!,
       { expiresIn: "7d" }
     );
 
     // Simpan token di cookies HTTP-only
     const response = NextResponse.json({ message: "Login successful" });
-    response.cookies.set("user_token", token, {
+    response.cookies.set("store_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",

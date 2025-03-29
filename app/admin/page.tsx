@@ -1,13 +1,27 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { ArrowUpRight, CalendarDays, CheckCircle2, Clock, DollarSign, Plus, Store, Users } from "lucide-react"
-import { AdminRecentActivity } from "@/components/admin/recent-activity"
-import { AdminVendorApprovals } from "@/components/admin/vendor-approvals"
-import { useState, useEffect } from "react"
-import Vendor from "@/models/Vendor"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import {
+  ArrowUpRight,
+  CalendarDays,
+  CheckCircle2,
+  Clock,
+  DollarSign,
+  Plus,
+  Store,
+  Users,
+} from "lucide-react";
+import { AdminRecentActivity } from "@/components/admin/recent-activity";
+import { AdminVendorApprovals } from "@/components/admin/vendor-approvals";
+import { useState, useEffect } from "react";
 
 interface Ivendor {
   name: string;
@@ -26,6 +40,7 @@ interface Ivendor {
 export default function AdminDashboard() {
   const [csrfToken, setCsrfToken] = useState("");
   const [InactiveVendor, setInactiveVendor] = useState<Ivendor[] | null>(null);
+  const [loading, setLoading] = useState<Boolean>(true);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -37,26 +52,27 @@ export default function AdminDashboard() {
       } else {
         setInactiveVendor(null);
       }
-    }
+    };
 
     fetch("/api/csrf")
       .then((res) => res.json())
       .then((data) => setCsrfToken(data.csrfToken));
-  
-    fetchUser()
+
+    fetchUser();
   }, []);
 
-  function newBazaarEvent (): void {
-    
-  }
-  
+  function newBazaarEvent(): void {}
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Dashboard Overview</h2>
-          <p className="text-muted-foreground">Welcome back! Here's what's happening with your bazaar ecosystem.</p>
+          <h2 className="text-2xl font-bold tracking-tight">
+            Dashboard Overview
+          </h2>
+          <p className="text-muted-foreground">
+            Welcome back! Here's what's happening with your bazaar ecosystem.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={newBazaarEvent}>
@@ -85,7 +101,9 @@ export default function AdminDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Vendors</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Active Vendors
+            </CardTitle>
             <Store className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -106,7 +124,9 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground mt-1">3 upcoming in next 30 days</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              3 upcoming in next 30 days
+            </p>
           </CardContent>
         </Card>
 
@@ -131,7 +151,9 @@ export default function AdminDashboard() {
         <Card className="md:col-span-4">
           <CardHeader>
             <CardTitle>Approval Queue</CardTitle>
-            <CardDescription>Pending vendor and store approvals requiring your attention</CardDescription>
+            <CardDescription>
+              Pending vendor and store approvals requiring your attention
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="vendors">
@@ -149,16 +171,20 @@ export default function AdminDashboard() {
                   <CheckCircle2 className="h-12 w-12 text-green-500 mb-4" />
                   <h3 className="text-lg font-medium">All Caught Up!</h3>
                   <p className="text-sm text-muted-foreground max-w-md mt-1">
-                    There are no pending store approvals at the moment. New requests will appear here.
+                    There are no pending store approvals at the moment. New
+                    requests will appear here.
                   </p>
                 </div>
               </TabsContent>
               <TabsContent value="products">
                 <div className="flex flex-col items-center justify-center py-8 text-center">
                   <Clock className="h-12 w-12 text-amber-500 mb-4" />
-                  <h3 className="text-lg font-medium">5 Products Pending Review</h3>
+                  <h3 className="text-lg font-medium">
+                    5 Products Pending Review
+                  </h3>
                   <p className="text-sm text-muted-foreground max-w-md mt-1">
-                    These products require your review before they can be listed.
+                    These products require your review before they can be
+                    listed.
                   </p>
                   <Button variant="outline" className="mt-4">
                     Review Products
@@ -172,7 +198,9 @@ export default function AdminDashboard() {
         <Card className="md:col-span-3">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Latest actions and updates in your system</CardDescription>
+            <CardDescription>
+              Latest actions and updates in your system
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <AdminRecentActivity />
@@ -180,6 +208,5 @@ export default function AdminDashboard() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
-
