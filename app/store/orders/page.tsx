@@ -11,7 +11,7 @@ export default function StoreOrdersPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Orders</h2>
-          <p className="text-muted-foreground">Manage your store's orders and transactions</p>
+          <p className="text-muted-foreground">Manage your store&apos;s orders and transactions</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline">

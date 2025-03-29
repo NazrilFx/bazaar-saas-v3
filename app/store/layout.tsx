@@ -14,7 +14,6 @@ import {
   Zap,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import Vendor from "@/models/Vendor";
 import { IStore } from "@/models/Store";
 
 const navItems = [
@@ -67,7 +66,7 @@ export default function StoreLayout({
 }>) {
   const [vendorName, setVendorName] = useState("")
   const [store, setStore] = useState<IStore | null>(null);
-  const [loading, setLoading] = useState<Boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchUser = async () => {

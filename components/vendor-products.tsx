@@ -67,11 +67,12 @@ const products: Product[] = [
   },
 ]
 
-interface VendorProductsProps {
-  vendorId: string
-}
+// Untuk props mengambil vendorId
+// interface VendorProductsProps {
+//   vendorId: string
+// }
 
-export function VendorProducts({ vendorId }: VendorProductsProps) {
+export function VendorProducts() {
   const [searchQuery, setSearchQuery] = useState("")
 
   const filteredProducts = products.filter(

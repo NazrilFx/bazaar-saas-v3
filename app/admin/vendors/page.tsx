@@ -13,21 +13,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminVendorsList } from "@/components/admin/vendors-list";
 import { Filter, Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-
-interface Ivendor {
-  name: string;
-  email: string;
-  description: string;
-  phone: string;
-  profile_image: string;
-  business_type: string;
-  contact_name: string;
-  password_hash: string;
-  verified: boolean;
-  created_at: Date;
-  updated_at: Date;
-}
 
 export default function VendorManagement() {
   const router = useRouter();

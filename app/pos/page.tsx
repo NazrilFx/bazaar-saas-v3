@@ -10,15 +10,6 @@ interface User {
   image?: string;
 }
 
-const logout = async () => {
-  try {
-    await fetch("/api/auth/logout", { method: "GET" });
-    window.location.href = "/"; // Redirect ke halaman home
-  } catch (error) {
-    console.error("Logout failed:", error);
-  }
-};
-
 export default function POSPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);

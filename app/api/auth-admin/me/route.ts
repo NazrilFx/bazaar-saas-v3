@@ -24,7 +24,13 @@ export async function GET(req: NextRequest) {
     if (!user) return NextResponse.json({ user: null }, { status: 404 });
 
     return NextResponse.json({ user });
-  } catch (error) {
-    return NextResponse.json({ user: null }, { status: 401 });
+  } catch (error: unknown) {
+    let errorMessage = "Internal Server Error";
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
+    return NextResponse.json({ user: null, error: errorMessage }, { status: 401 });
   }
 }

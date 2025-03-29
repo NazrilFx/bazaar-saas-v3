@@ -27,6 +27,8 @@ export default function SignupPage() {
     fetch("/api/csrf")
       .then((res) => res.json())
       .then((data) => setCsrfToken(data.csrfToken));
+
+      fetchUser()
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -59,8 +61,13 @@ export default function SignupPage() {
       if (!res.ok) throw new Error(data.message || "Signup failed");
 
       setMessage("Signup successful! You can now login.");
-    } catch (error: any) {
-      setMessage(error.message);
+    } catch (error: unknown) {
+      let errorMessage = "Internal Server Error";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }  
+      setMessage(errorMessage);
       console.error("Signup error:", error);
     } finally {
       setLoading(false);

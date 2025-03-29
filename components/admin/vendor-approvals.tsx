@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, XCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
@@ -27,26 +27,6 @@ interface AdminVendorApprovalsProps {
 }
 
 export function AdminVendorApprovals({ vendors }: AdminVendorApprovalsProps) {
-  const [email, setEmail] = useState("");
-  const [csrfToken, setCsrfToken] = useState("");
-
-  const reject = async () => {
-    try {
-      const res = await fetch("/api/admin/verified-vendor", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message || "Login failed");
-    } catch (error: any) {
-      console.error(error.message);
-    } finally {
-      console.log("Berhasil");
-    }
-  };
 
   if (vendors?.length == 0) {
     return (
@@ -97,7 +77,6 @@ export function AdminVendorApprovals({ vendors }: AdminVendorApprovalsProps) {
               size="sm"
               variant="outline"
               className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-              onClick={() => reject()}
             >
               <XCircle className="mr-1 h-4 w-4" />
               Reject

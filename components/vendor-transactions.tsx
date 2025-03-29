@@ -66,11 +66,12 @@ const transactions: Transaction[] = [
   },
 ]
 
-interface VendorTransactionsProps {
-  vendorId: string
-}
+// Untuk props yang nantinya mengambil vendorId
+// interface VendorTransactionsProps {
+//   vendorId: string
+// }
 
-export function VendorTransactions({ vendorId }: VendorTransactionsProps) {
+export function VendorTransactions() {
   const [searchQuery, setSearchQuery] = useState("")
 
   const filteredTransactions = transactions.filter(

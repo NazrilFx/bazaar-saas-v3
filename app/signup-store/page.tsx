@@ -43,7 +43,7 @@ export default function SignupPage() {
   }, []);
 
   if (vendor == null) {
-    return <div>Sorry you don't allow to access this page</div>;
+    return <div>Sorry you don&apos;t allow to access this page</div>;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,8 +84,14 @@ export default function SignupPage() {
 
       setMessage("Signup successful! You can now login.");
       router.push("/login-store");
-    } catch (error: any) {
-      setMessage(error.message);
+    } catch (error: unknown) {
+      let errorMessage = "Internal Server Error";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+  
+      setMessage(errorMessage);
       console.error("Signup error:", error);
     } finally {
       setLoading(false);

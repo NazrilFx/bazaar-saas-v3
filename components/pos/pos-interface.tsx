@@ -252,7 +252,7 @@ export function POSInterface({ name, image }: ProfileDropdownProps) {
               <ShoppingCart className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium">No Products Found</h3>
               <p className="text-sm text-muted-foreground max-w-md mt-1">
-                Try adjusting your search or filter to find what you're looking
+                Try adjusting your search or filter to find what you&apos;re looking
                 for.
               </p>
             </div>

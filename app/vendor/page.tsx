@@ -112,7 +112,7 @@ export default function VendorDashboard() {
         <Card className="md:col-span-3">
           <CardHeader>
             <CardTitle>Upcoming Events</CardTitle>
-            <CardDescription>Bazaar events you're participating in</CardDescription>
+            <CardDescription>Bazaar events you&apos;re participating in</CardDescription>
           </CardHeader>
           <CardContent>
             <VendorEventsList />
