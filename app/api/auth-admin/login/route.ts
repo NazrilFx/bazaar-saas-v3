@@ -3,12 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Admin from "@/models/Admin";
 import connectDB from "@/lib/dbConnect";
-
-export function getCookieToken(req: Request, cookieName: string) {
-  const cookies = req.headers.get("cookie") || "";
-  const match = cookies.match(new RegExp(`${cookieName}=([^;]+)`));
-  return match ? match[1] : null;
-}
+import getCookieToken from "@/utils/getCookieToken";
 
 export const POST = async (req: Request) => {
   try {
