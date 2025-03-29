@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
     // Ubah vendor menjadi objek biasa & pastikan `_id` dalam bentuk string
     return NextResponse.json({ vendor: { ...vendor.toObject(), _id: vendor._id.toString() } });
   } catch (error) {
+    console.error(error)
     return NextResponse.json({ vendor: null }, { status: 401 });
   }
 }

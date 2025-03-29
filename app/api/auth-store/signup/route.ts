@@ -39,10 +39,15 @@ export async function POST(req: Request) {
     await newStore.save();
 
     return NextResponse.json({ message: "User registered successfully!" }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Signup Error:", error);
+    let errorMessage = "Internal Server Error";
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
     return NextResponse.json(
-      { message: error.message, error: error.message },
+      { message: errorMessage, error: errorMessage },
       { status: 500 }
     );
   }

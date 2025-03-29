@@ -31,27 +31,6 @@ interface Ivendor {
 
 export default function VendorManagement() {
   const router = useRouter();
-  const [csrfToken, setCsrfToken] = useState("");
-  const [InactiveVendor, setInactiveVendor] = useState<Ivendor[] | null>(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const res = await fetch("/api/admin/dashboard"); // Fetch dari API Next.js
-      const data = await res.json();
-
-      if (res.ok) {
-        setInactiveVendor(data.inactiveVendors);
-      } else {
-        setInactiveVendor(null);
-      }
-    };
-
-    fetch("/api/csrf")
-      .then((res) => res.json())
-      .then((data) => setCsrfToken(data.csrfToken));
-
-    fetchUser();
-  }, []);
 
   const handleRedirect = () => {
     router.push("/signup-vendor"); // Berfungsi di App Router

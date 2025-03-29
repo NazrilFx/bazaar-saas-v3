@@ -29,7 +29,8 @@ export async function GET(req: NextRequest) {
     const vendorName = vendor?.name || null;
 
     return NextResponse.json({ store, vendor_name: vendorName });
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error("Login Error:", error);
     return NextResponse.json({ store: null, vendor_name: null }, { status: 401 });
   }
 }

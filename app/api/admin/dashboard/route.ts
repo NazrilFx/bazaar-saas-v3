@@ -10,7 +10,7 @@ export async function GET() {
     const inactiveVendors = await Vendor.find({ verified: false }).lean();
 
     return NextResponse.json({ inactiveVendors }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching data:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }

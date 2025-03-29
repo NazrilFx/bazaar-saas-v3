@@ -22,25 +22,10 @@ import {
 import { AdminRecentActivity } from "@/components/admin/recent-activity";
 import { AdminVendorApprovals } from "@/components/admin/vendor-approvals";
 import { useState, useEffect } from "react";
-
-interface Ivendor {
-  name: string;
-  email: string;
-  description: string;
-  phone: string;
-  profile_image: string;
-  business_type: string;
-  contact_name: string;
-  password_hash: string;
-  verified: boolean;
-  created_at: Date;
-  updated_at: Date;
-}
+import { IVendor } from "@/models/Vendor";
 
 export default function AdminDashboard() {
-  const [csrfToken, setCsrfToken] = useState("");
-  const [InactiveVendor, setInactiveVendor] = useState<Ivendor[] | null>(null);
-  const [loading, setLoading] = useState<Boolean>(true);
+  const [InactiveVendor, setInactiveVendor] = useState<IVendor[] | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -53,10 +38,6 @@ export default function AdminDashboard() {
         setInactiveVendor(null);
       }
     };
-
-    fetch("/api/csrf")
-      .then((res) => res.json())
-      .then((data) => setCsrfToken(data.csrfToken));
 
     fetchUser();
   }, []);
@@ -71,7 +52,7 @@ export default function AdminDashboard() {
             Dashboard Overview
           </h2>
           <p className="text-muted-foreground">
-            Welcome back! Here's what's happening with your bazaar ecosystem.
+            Welcome back! Here&apos;s what&apos;s happening with your bazaar ecosystem.
           </p>
         </div>
         <div className="flex items-center gap-2">
