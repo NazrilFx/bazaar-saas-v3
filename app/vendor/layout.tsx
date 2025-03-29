@@ -72,7 +72,7 @@ export default function VendorLayout({
   children: React.ReactNode;
 }>) {
   const [vendor, setVendor] = useState<Ivendor | null>(null);
-  const [loading, setLoading] = useState<Boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchUser = async () => {

@@ -125,7 +125,7 @@ export default function StoreDashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Sales Analytics</CardTitle>
-          <CardDescription>Your store's performance metrics</CardDescription>
+          <CardDescription>Your store&apos;s performance metrics</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="sales">

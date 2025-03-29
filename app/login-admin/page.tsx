@@ -29,8 +29,14 @@ export default function LoginPage() {
 
       setMessage("Login successful!");
       router.push("/admin"); // Arahkan ke halaman setelah login
-    } catch (error: any) {
-      setMessage(error.message);
+    } catch (error: unknown) {
+      let errorMessage = "Internal Server Error";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+  
+      setMessage(errorMessage);
     } finally {
       setLoading(false);
     }

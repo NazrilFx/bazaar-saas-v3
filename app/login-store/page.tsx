@@ -47,8 +47,14 @@ export default function LoginPage() {
 
       setMessage("Login successful!");
       router.push("/store");
-    } catch (error: any) {
-      setMessage(error.message);
+    } catch (error: unknown) {
+      let errorMessage = "Internal Server Error";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+  
+      setMessage(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -88,7 +94,7 @@ export default function LoginPage() {
             {loading ? "Logging in..." : "Login"}
           </button>
           <p className="mt-5">
-          Don't have an account yet?
+          Don&apos;t have an account yet?
           <a href="/signup-store" className="text-blue-500 underline ml-2">
             Click Here
           </a>
