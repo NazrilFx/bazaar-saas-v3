@@ -23,6 +23,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [csrfToken, setCsrfToken] = useState("");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -42,6 +43,10 @@ export default function SignupPage() {
         setLoading(false);
       }
     };
+
+    fetch("/api/csrf")
+      .then((res) => res.json())
+      .then((data) => setCsrfToken(data.csrfToken));
 
     fetchUser();
   }, []);
@@ -73,6 +78,7 @@ export default function SignupPage() {
           business_type,
           contact_name,
           password,
+          csrfToken,
         }),
         redirect: "manual",
       });

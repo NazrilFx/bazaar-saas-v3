@@ -107,6 +107,7 @@ export default function VendorLayout({
       subtitle="Manage your stores and bazaar participation"
       userRole="Vendor"
       userName={vendor.name}
+      logout="/api/auth-vendor/logout"
     >
       {children}
     </DashboardLayout>

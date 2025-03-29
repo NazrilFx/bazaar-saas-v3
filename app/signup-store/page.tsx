@@ -3,9 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { IVendor } from "@/models/Vendor";
- 
+
 export default function SignupPage() {
-  const router = useRouter()
+  const router = useRouter();
   const [vendor, setVendor] = useState<IVendor | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -35,6 +35,10 @@ export default function SignupPage() {
       }
     };
 
+    fetch("/api/csrf")
+      .then((res) => res.json())
+      .then((data) => setCsrfToken(data.csrfToken));
+
     fetchUser();
   }, []);
 
@@ -63,6 +67,7 @@ export default function SignupPage() {
           description,
           location,
           password,
+          csrfToken,
         }),
         redirect: "manual",
       });
@@ -78,7 +83,7 @@ export default function SignupPage() {
       if (!res.ok) throw new Error(data.message || "Signup failed");
 
       setMessage("Signup successful! You can now login.");
-      router.push("/login-store")
+      router.push("/login-store");
     } catch (error: any) {
       setMessage(error.message);
       console.error("Signup error:", error);
@@ -93,7 +98,9 @@ export default function SignupPage() {
         <h2 className="text-2xl font-bold text-center mb-4">
           Create a store account
         </h2>
-        <p className="my-5 text-center">Made by Vendor <span className="text-blue-500">{vendor.name}</span></p>
+        <p className="my-5 text-center">
+          Made by Vendor <span className="text-blue-500">{vendor.name}</span>
+        </p>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-500">Name Store</label>

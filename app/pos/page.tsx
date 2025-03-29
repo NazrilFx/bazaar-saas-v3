@@ -11,7 +11,6 @@ interface User {
 }
 
 const logout = async () => {
-  console.log("Logout dipanggil")
   try {
     await fetch("/api/auth/logout", { method: "GET" });
     window.location.href = "/"; // Redirect ke halaman home

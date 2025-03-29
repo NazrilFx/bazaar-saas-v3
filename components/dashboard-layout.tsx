@@ -39,6 +39,7 @@ interface DashboardLayoutProps {
   subtitle?: string;
   userRole: string;
   userName: string;
+  logout: string;
 }
 
 export function DashboardLayout({
@@ -49,6 +50,7 @@ export function DashboardLayout({
   subtitle,
   userRole,
   userName,
+  logout,
 }: DashboardLayoutProps) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -135,7 +137,7 @@ export function DashboardLayout({
                 <DropdownMenuItem
                   onClick={async () => {
                     try {
-                      await fetch("/api/auth-admin/logout", { method: "GET" });
+                      await fetch(logout, { method: "GET" });
                       window.location.href = "/"; // Redirect ke halaman home setelah logout
                     } catch (error) {
                       console.error("Logout failed:", error);

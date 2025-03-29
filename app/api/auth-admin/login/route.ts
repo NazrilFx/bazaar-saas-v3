@@ -4,10 +4,22 @@ import jwt from "jsonwebtoken";
 import Admin from "@/models/Admin";
 import connectDB from "@/lib/dbConnect";
 
+export function getCookieToken(req: Request, cookieName: string) {
+  const cookies = req.headers.get("cookie") || "";
+  return cookies.match(new RegExp(`${cookieName}=([^;]+)`))?.[1] || null;
+}
+
 export async function POST(req: Request) {
   try {
     await connectDB();
-    const { email, password } = await req.json();
+    const csrfTokenFromCookie = getCookieToken(req, "csrf_token");
+    const { email, password, csrfToken } = await req.json();
+
+    // Perbaiki validasi CSRF token
+    if (!csrfTokenFromCookie || !csrfToken || csrfTokenFromCookie !== csrfToken) {
+      return NextResponse.json({ message: "Invalid CSRF" }, { status: 403 });
+    }
+
 
     // Cek apakah user ada di database
     const user = await Admin.findOne({ email });

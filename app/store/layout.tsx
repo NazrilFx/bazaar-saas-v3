@@ -103,6 +103,7 @@ export default function StoreLayout({
       subtitle="Organic Delights at Summer Food Festival"
       userRole={`Vendor ${vendorName}`}
       userName={store.name}
+      logout="/api/auth-store/logout"
     >
       {children}
     </DashboardLayout>

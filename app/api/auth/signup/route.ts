@@ -2,11 +2,17 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import User from "@/models/User";
 import connectDB from "@/lib/dbConnect";
+import getCookieToken from "@/utils/getCookieToken";
 
 export async function POST(req: Request) {
   try {
     await connectDB();
-    const { name, email, password, phone } = await req.json();
+    const { name, email, password, phone, csrfToken } = await req.json();
+    const csrfTokenFromCookie = getCookieToken(req, "csrf_token");
+
+    if (!csrfTokenFromCookie || !csrfToken || csrfTokenFromCookie !== csrfToken) {
+      return NextResponse.json({ message: "Invalid CSRF" }, { status: 403 });
+    }
 
     // Cek apakah email sudah ada
     const existingUser = await User.findOne({ email });

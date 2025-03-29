@@ -97,6 +97,7 @@ export default function AdminLayout({children,}: Readonly<{children: React.React
       theme="admin"
       title="Admin Dashboard"
       subtitle="Manage your bazaar ecosystem"
+      logout="/api/auth-admin/logout"
       userRole={admin.role}
       userName={admin.name}
     >
