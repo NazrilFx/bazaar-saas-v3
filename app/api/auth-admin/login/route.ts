@@ -6,10 +6,11 @@ import connectDB from "@/lib/dbConnect";
 
 export function getCookieToken(req: Request, cookieName: string) {
   const cookies = req.headers.get("cookie") || "";
-  return cookies.match(new RegExp(`${cookieName}=([^;]+)`))?.[1] || null;
+  const match = cookies.match(new RegExp(`${cookieName}=([^;]+)`));
+  return match ? match[1] : null;
 }
 
-export async function POST(req: Request) {
+export const POST = async (req: Request) => {
   try {
     await connectDB();
     const csrfTokenFromCookie = getCookieToken(req, "csrf_token");
