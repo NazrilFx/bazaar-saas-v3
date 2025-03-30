@@ -66,12 +66,11 @@ const transactions: Transaction[] = [
   },
 ]
 
-// Untuk props yang nantinya mengambil vendorId
-// interface VendorTransactionsProps {
-//   vendorId: string
-// }
+interface VendorProductsProps {
+  vendorId: string;
+}
 
-export function VendorTransactions() {
+export function VendorTransactions({ vendorId }: VendorProductsProps) {  
   const [searchQuery, setSearchQuery] = useState("")
 
   const filteredTransactions = transactions.filter(
@@ -119,7 +118,7 @@ export function VendorTransactions() {
             {filteredTransactions.map((transaction) => (
               <TableRow key={transaction.id}>
                 <TableCell>
-                  {transaction.date}, {transaction.time}
+                  {transaction.date}, {transaction.time}, {vendorId}
                 </TableCell>
                 <TableCell className="font-mono text-xs">{transaction.id}</TableCell>
                 <TableCell>{transaction.customer}</TableCell>

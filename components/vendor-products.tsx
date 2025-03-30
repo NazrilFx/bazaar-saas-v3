@@ -68,11 +68,11 @@ const products: Product[] = [
 ]
 
 // Untuk props mengambil vendorId
-// interface VendorProductsProps {
-//   vendorId: string
-// }
+interface VendorProductsProps {
+  vendorId: string;
+}
 
-export function VendorProducts() {
+export function VendorProducts({ vendorId }: VendorProductsProps) {  
   const [searchQuery, setSearchQuery] = useState("")
 
   const filteredProducts = products.filter(
@@ -121,7 +121,7 @@ export function VendorProducts() {
                     </div>
                     <div>
                       <div className="font-medium">{product.name}</div>
-                      <div className="text-xs text-muted-foreground">ID: {product.id}</div>
+                      <div className="text-xs text-muted-foreground">ID: {product.id} vendor ID: {vendorId}</div>
                     </div>
                   </div>
                 </TableCell>
