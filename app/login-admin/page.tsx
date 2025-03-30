@@ -43,9 +43,20 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
+    const fetchUser = async () => {
+      const res = await fetch("/api/auth-admin/me");
+      const data = await res.json();
+
+      if (data.user) {
+        router.push("/admin");
+      }
+    };
+
     fetch("/api/csrf")
       .then((res) => res.json())
       .then((data) => setCsrfToken(data.csrfToken));
+
+    fetchUser()
   }, []);
 
   return (

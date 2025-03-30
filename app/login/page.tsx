@@ -112,7 +112,7 @@ export default function LoginPage() {
           </button>
           <p className="mt-5">
           Don&apos;t have an account yet?
-          <a href="/signup-vendor" className="text-blue-500 underline ml-2">
+          <a href="/signup" className="text-blue-500 underline ml-2">
             Click Here
           </a>
         </p>
