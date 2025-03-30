@@ -9,8 +9,6 @@ import { VendorTransactions } from "@/components/vendor-transactions"
 import { VendorStats } from "@/components/vendor-stats"
 
 export default function VendorDetailsPage({ params }: { params: { id: string } }) {
-  // Handle undefined params.id
-  const vendorId = params?.id || ""  
   
   // In a real app, you would fetch vendor data based on the ID
   const vendor = {
