@@ -8,17 +8,14 @@ import { VendorProducts } from "@/components/vendor-products"
 import { VendorTransactions } from "@/components/vendor-transactions"
 import { VendorStats } from "@/components/vendor-stats"
 
-interface VendorDetailsPageProps {
-  params: {
-    id: string;
-  };
-}
 
-export default function VendorDetailsPage({ params }: VendorDetailsPageProps) {
-  
+export default async function VendorDetailsPage({ params }: {params: Promise<{id : string}>}) {
+
+  const { id } = await params
+
   // In a real app, you would fetch vendor data based on the ID
   const vendor = {
-    id: params.id,
+    id: id,
     name: "Food Truck Delights",
     category: "Food & Beverages",
     description: "Serving delicious street food at the festival",
@@ -90,10 +87,10 @@ export default function VendorDetailsPage({ params }: VendorDetailsPageProps) {
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="products" className="mt-6">
-            <VendorProducts vendorId={params.id} />
+            <VendorProducts vendorId={id} />
           </TabsContent>
           <TabsContent value="transactions" className="mt-6">
-            <VendorTransactions vendorId={params.id} />
+            <VendorTransactions vendorId={id} />
           </TabsContent>
           <TabsContent value="settings" className="mt-6">
             <Card>
