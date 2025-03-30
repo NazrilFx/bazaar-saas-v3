@@ -8,7 +8,13 @@ import { VendorProducts } from "@/components/vendor-products"
 import { VendorTransactions } from "@/components/vendor-transactions"
 import { VendorStats } from "@/components/vendor-stats"
 
-export default function VendorDetailsPage({ params }: { params: { id: string } }) {
+interface VendorDetailsPageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function VendorDetailsPage({ params }: VendorDetailsPageProps) {
   
   // In a real app, you would fetch vendor data based on the ID
   const vendor = {
