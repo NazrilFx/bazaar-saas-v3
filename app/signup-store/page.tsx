@@ -83,7 +83,6 @@ export default function SignupPage() {
       if (!res.ok) throw new Error(data.message || "Signup failed");
 
       setMessage("Signup successful! You can now login.");
-      router.push("/login-store");
     } catch (error: unknown) {
       let errorMessage = "Internal Server Error";
 
@@ -95,6 +94,7 @@ export default function SignupPage() {
       console.error("Signup error:", error);
     } finally {
       setLoading(false);
+      router.push("/login-store");
     }
   };
 

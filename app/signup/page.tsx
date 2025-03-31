@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 export default function SignupPage() {
+  const router = useRouter()
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -52,6 +54,7 @@ export default function SignupPage() {
       console.error("Signup error:", error);
     } finally {
       setLoading(false);
+      router.push("/login")
     }
   };
 

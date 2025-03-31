@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 
 interface Admin {
   _id: string;
@@ -12,6 +13,7 @@ interface Admin {
 }
 
 export default function SignupPage() {
+  const router = useRouter()
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -105,6 +107,7 @@ export default function SignupPage() {
       console.error("Signup error:", error);
     } finally {
       setLoading(false);
+      router.push("/login-vendor")
     }
   };
 
