@@ -63,6 +63,7 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.message || "Login failed");
 
       setMessage("Login successful!");
+      window.location.reload()
     } catch (error: unknown) {
       let errorMessage = "Internal Server Error";
 
@@ -73,7 +74,6 @@ export default function LoginPage() {
       setMessage(errorMessage);
     } finally {
       setLoading(false);
-      router.push("/pos");
     }
   };
 
