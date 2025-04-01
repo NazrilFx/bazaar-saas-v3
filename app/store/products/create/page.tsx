@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { IStore } from "@/models/Store";
 
 export default function SignupPage() {
-  const router = useRouter()
   const [store, setStore] = useState<IStore | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -22,7 +20,7 @@ export default function SignupPage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/auth-vendor/me"); // Fetch dari API Next.js
+        const res = await fetch("/api/auth-store/me"); // Fetch dari API Next.js
         const data = await res.json();
 
         if (res.ok) {
@@ -58,7 +56,7 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth-vendor/signup", {
+      const res = await fetch("/api/product/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -96,7 +94,6 @@ export default function SignupPage() {
       console.error("Signup error:", error);
     } finally {
       setLoading(false);
-      router.push("/login-vendor")
     }
   };
 
@@ -104,7 +101,7 @@ export default function SignupPage() {
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center mb-4">
-          Create a vendor account
+          Create a new product
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -159,12 +156,14 @@ export default function SignupPage() {
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200 bg-white"
             >
               <option value="" disabled>
-                Select a business type
+                Select category
               </option>
               <option value="retail">Food</option>
-              <option value="service">Book</option>
-              <option value="manufacturing">Manufacturing</option>
-              <option value="technology">Technology</option>
+              <option value="service">Beverages</option>
+              <option value="manufacturing">Snacks</option>
+              <option value="technology">Bakery</option>
+              <option value="technology">Desserts</option>
+              <option value="technology">Merchandise</option>
             </select>
           </div>
 
