@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const [csrfToken, setCsrfToken] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,7 +38,7 @@ export default function LoginPage() {
       setMessage(errorMessage);
     } finally {
       setLoading(false);
-      router.push("/admin"); // Arahkan ke halaman setelah login
+      redirect("/admin"); // Arahkan ke halaman setelah login
     }
   };
 
@@ -49,7 +48,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (data.user) {
-        router.push("/admin");
+        redirect("/admin");
       }
     };
 

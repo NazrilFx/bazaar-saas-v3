@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 export default function LoginPage() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const [csrfToken, setCsrfToken] = useState("");
 
   useEffect(() => {
@@ -16,8 +15,8 @@ export default function LoginPage() {
       const res = await fetch("/api/auth-store/me");
       const data = await res.json();
 
-      if (data.user) {
-        router.push("/store");
+      if (data.store) {
+        redirect("/store");
       }
     };
 
@@ -46,7 +45,6 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.message || "Login failed");
 
       setMessage("Login successful!");
-      window.location.reload()
     } catch (error: unknown) {
       let errorMessage = "Internal Server Error";
 
@@ -57,7 +55,7 @@ export default function LoginPage() {
       setMessage(errorMessage);
     } finally {
       setLoading(false);
-      router.push("/store");
+      redirect("/store")
     }
   };
 
