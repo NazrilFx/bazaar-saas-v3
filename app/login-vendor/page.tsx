@@ -55,6 +55,7 @@ export default function LoginPage() {
       }
   
       setMessage(errorMessage);
+      window.location.reload()
     } finally {
       setLoading(false);
       router.push("/vendor"); // Arahkan ke halaman setelah login
