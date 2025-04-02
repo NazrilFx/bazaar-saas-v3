@@ -11,8 +11,8 @@ interface ICategory {
 
 export default function SignupPage() {
   const [categories, setCategories] = useState<ICategory[] | null>(null);
-  const [storeId, setStoreId] = useState<String | null>(null);
-  const [vendorId, setVendorId] = useState<String | null>(null);
+  const [storeId, setStoreId] = useState<string | null>(null);
+  const [vendorId, setVendorId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [stock, setStock] = useState<number | null>(null);
@@ -209,7 +209,7 @@ export default function SignupPage() {
           </div>
           {imageBase64 && (
             <>
-              <img src={imageBase64} alt="Resized preview" />
+              <img src={imageBase64} alt="Resized preview"/>
             </>
           )}
           <div className="mb-4">
