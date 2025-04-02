@@ -23,6 +23,11 @@ const navItems = [
     icon: <Home className="h-5 w-5" />,
   },
   {
+    title: "Category",
+    href: "/store/category",
+    icon: <ShoppingBag className="h-5 w-5" />,
+  },
+  {
     title: "Products",
     href: "/store/products",
     icon: <ShoppingBag className="h-5 w-5" />,

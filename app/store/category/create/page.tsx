@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { IStore } from "@/models/Store";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 export default function SignupPage() {
   const [store, setStore] = useState<IStore | null>(null);
@@ -84,6 +86,7 @@ export default function SignupPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+      <Link href={'/store/category'}><ArrowLeft></ArrowLeft></Link>
         <h2 className="text-2xl font-bold text-center mb-4">
           Create a new category
         </h2>

@@ -35,21 +35,25 @@ export default function CategoryPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this category?")) return;
-
+  
     try {
-      const res = await fetch(`/api/category/${id}`, {
-        method: "DELETE",
+      const res = await fetch("/api/category/delete", {
+        method: "POST",  // Gunakan POST karena kita kirim body
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }), // Kirim ID di dalam body
       });
-
+  
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to delete category");
-
+  
       setCategories((prev) => prev.filter((category) => category._id !== id));
     } catch (err) {
       alert(err instanceof Error ? err.message : "Unknown error");
     }
   };
-
+  
   if (loading) return <p>Loading categories...</p>;
   if (error) return <p className="text-red-500">Error: {error}</p>;
 
