@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -8,8 +9,31 @@ import { StoreProductsList } from "@/components/store/products-list"
 import { Filter, Plus, Search } from "lucide-react"
 import { useRouter } from "next/navigation"
 
+
 export default function StoreProductsPage() {
   const router = useRouter()
+  const [product, setProduct] = useState< | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/product"); // Fetch dari API Next.js
+        const data = await res.json();
+
+        if (res.ok) {
+          setProduct(data.products);
+        } else {
+          setProduct(null);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    
+    fetchUser();
+
+  }, []);
+
 
   return (
     <div className="space-y-6">
@@ -57,16 +81,16 @@ export default function StoreProductsPage() {
               <TabsTrigger value="out_of_stock">Out of Stock</TabsTrigger>
             </TabsList>
             <TabsContent value="all">
-              <StoreProductsList status="all" />
+              <StoreProductsList status="all" products={product ?? []} />
             </TabsContent>
             <TabsContent value="in_stock">
-              <StoreProductsList status="in_stock" />
+              <StoreProductsList status="in_stock" products={product ?? []} />
             </TabsContent>
             <TabsContent value="low_stock">
-              <StoreProductsList status="low_stock" />
+              <StoreProductsList status="low_stock" products={product ?? []} />
             </TabsContent>
             <TabsContent value="out_of_stock">
-              <StoreProductsList status="out_of_stock" />
+              <StoreProductsList status="out_of_stock" products={product ?? []} />
             </TabsContent>
           </Tabs>
         </CardContent>
