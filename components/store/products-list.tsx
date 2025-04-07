@@ -18,7 +18,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Image from "next/image";
 
 interface IProduct {
   _id: string;
@@ -29,8 +28,6 @@ interface IProduct {
   status: "in_stock" | "low_stock" | "out_of_stock";
   image?: string;
 }
-
-const products: IProduct[] = [];
 
 interface StoreProductsListProps {
   status: "all" | "in_stock" | "low_stock" | "out_of_stock";
