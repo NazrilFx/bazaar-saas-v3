@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import User from "@/models/User";
+import Activity from "@/models/Activity";
 import connectDB from "@/lib/dbConnect";
 import getCookieToken from "@/utils/getCookieToken";
 
@@ -35,6 +36,17 @@ export async function POST(req: Request) {
     });
 
     await newUser.save();
+
+    const user_id = newUser._id
+    
+    const newActivity = new Activity ({
+      user_id,
+      user_role : "user",
+      action : `User ${name} signed up with email ${email}`,
+      created_at : new Date(),
+    })
+
+    await newActivity.save()
 
     return NextResponse.json({ message: "User registered successfully!" }, { status: 201 });
   } catch (error: unknown) {

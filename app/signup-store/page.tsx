@@ -64,6 +64,7 @@ export default function SignupPage() {
         body: JSON.stringify({
           name,
           vendor_id: vendor._id,
+          vendor_name: vendor.name,
           description,
           location,
           password,

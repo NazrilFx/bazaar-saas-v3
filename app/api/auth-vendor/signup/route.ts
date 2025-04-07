@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import Vendor from "@/models/Vendor";
 import connectDB from "@/lib/dbConnect";
+import Activity from "@/models/Activity";
 
 export async function POST(req: Request) {
   try {
@@ -33,6 +34,17 @@ export async function POST(req: Request) {
     });
 
     await newVendor.save();
+
+    const user_id = newVendor._id
+
+    const newActivity = new Activity({
+      user_id,
+      user_role: "vendor",
+      action: `Vendor ${name} signed up with email ${email} and business type ${business_type}`,
+      created_at: new Date(),
+    })
+
+    await newActivity.save()
 
     return NextResponse.json({ message: "User registered successfully!" }, { status: 201 });
   } catch (error: unknown) {

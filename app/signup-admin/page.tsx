@@ -15,20 +15,9 @@ export default function SignupPage() {
   const [csrfToken, setCsrfToken] = useState("");
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const res = await fetch("/api/auth/me");
-      const data = await res.json();
-
-      if (data.user) {
-        router.push("/admin");
-      }
-    };
-
     fetch("/api/csrf")
       .then((res) => res.json())
       .then((data) => setCsrfToken(data.csrfToken));
-
-      fetchUser()
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -3,11 +3,12 @@ import bcrypt from "bcryptjs";
 import Store from "@/models/Store";
 import connectDB from "@/lib/dbConnect";
 import getCookieToken from "@/utils/getCookieToken";
+import Activity from "@/models/Activity";
 
 export async function POST(req: Request) {
   try {
     await connectDB();
-    const { name, description, vendor_id, password, location, csrfToken } = await req.json();
+    const { name, description, vendor_name, vendor_id, password, location, csrfToken } = await req.json();
     const csrfTokenFromCookie = getCookieToken(req, "csrf_token");
 
     if (!csrfTokenFromCookie || !csrfToken || csrfTokenFromCookie !== csrfToken) {
@@ -37,6 +38,18 @@ export async function POST(req: Request) {
     });
 
     await newStore.save();
+
+    const user_id = newStore._id
+
+    const newActivity = new Activity({
+      user_id,
+      user_role: "store",
+      action: `Store ${name} created with vendor ${vendor_name}`,
+      created_at: new Date(),
+    })
+
+    await newActivity.save()
+
 
     return NextResponse.json({ message: "User registered successfully!" }, { status: 201 });
   } catch (error: unknown) {

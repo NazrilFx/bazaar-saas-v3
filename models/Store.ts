@@ -24,5 +24,5 @@ const StoreSchema: Schema<IStore> = new Schema({
   updated_at: { type: Date, default: Date.now },
 });
 
-const Vendor: Model<IStore> = mongoose.models.Store || mongoose.model<IStore>("Store", StoreSchema);
-export default Vendor;
+const Store: Model<IStore> = mongoose.models.Store || mongoose.model<IStore>("Store", StoreSchema);
+export default Store;

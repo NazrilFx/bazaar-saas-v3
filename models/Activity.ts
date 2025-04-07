@@ -1,18 +1,18 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-export interface IStore extends Document {
-  vendor_id: mongoose.Types.ObjectId; // Referensi ke vendor
-  password_hash: string;
+export interface IActivity extends Document {
+  user_id: mongoose.Types.ObjectId;
+  user_role: "admin" | "vendor" | "user" | "store"; // Menentukan asal user_id
   action: string;
   created_at: Date;
 }
 
-const StoreSchema: Schema<IStore> = new Schema({
-  vendor_id: { type: Schema.Types.ObjectId, ref: "Vendor", required: true }, // Relasi ke vendor
-  password_hash: { type: String, required: true },
+const ActivitySchema: Schema<IActivity> = new Schema({
+  user_id: { type: Schema.Types.ObjectId, required: true }, // ID user, bisa dari mana saja
+  user_role: { type: String, enum: ["admin", "vendor", "store", "user"], required: true }, // Menyimpan asal user_id
   action: { type: String, required: true },
   created_at: { type: Date, default: Date.now },
 });
 
-const Vendor: Model<IStore> = mongoose.models.Store || mongoose.model<IStore>("Store", StoreSchema);
-export default Vendor;
+const Activity = mongoose.models.Activity || mongoose.model<IActivity>("Activity", ActivitySchema);
+export default Activity;

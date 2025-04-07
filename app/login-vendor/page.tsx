@@ -15,19 +15,18 @@ export default function LoginPage() {
     const fetchUser = async () => {
       const res = await fetch("/api/auth-vendor/me");
       const data = await res.json();
-  
-      if (data.user) {
+      
+      if (data.vendor) {
         router.push("/vendor");
       }
     };
-  
+
     fetch("/api/csrf")
       .then((res) => res.json())
       .then((data) => setCsrfToken(data.csrfToken));
-  
+
     fetchUser();
   }, []);
-  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +38,7 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, csrfToken }),
+        redirect: "manual"
       });
 
       const data = await res.json();
@@ -46,16 +46,16 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.message || "Login failed");
 
       setMessage("Login successful!");
-      window.location.reload()
+      window.location.reload();
     } catch (error: unknown) {
       let errorMessage = "Internal Server Error";
 
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-  
+
       setMessage(errorMessage);
-      window.location.reload()
+      window.location.reload();
     } finally {
       setLoading(false);
       router.push("/vendor"); // Arahkan ke halaman setelah login
@@ -96,6 +96,9 @@ export default function LoginPage() {
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
+        <p className="mt-5">
+          Don&apos;t have an account yet? Ask Admin to Register Vendor
+        </p>
       </div>
     </div>
   );

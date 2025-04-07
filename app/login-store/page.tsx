@@ -45,18 +45,18 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.message || "Login failed");
 
       setMessage("Login successful!");
-      window.location.reload()
+      window.location.reload();
     } catch (error: unknown) {
       let errorMessage = "Internal Server Error";
 
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-  
+
       setMessage(errorMessage);
     } finally {
       setLoading(false);
-      redirect("/store")
+      redirect("/store");
     }
   };
 
@@ -94,13 +94,12 @@ export default function LoginPage() {
             {loading ? "Logging in..." : "Login"}
           </button>
           <p className="mt-5">
-          Don&apos;t have an account yet?
-          <a href="/signup-store" className="text-blue-500 underline ml-2">
-            Click Here
-          </a>
-        </p>
+            Don&apos;t have an account yet?
+            <a href="/signup-store" className="text-blue-500 underline ml-2">
+              Click Here
+            </a>
+          </p>
         </form>
-        
       </div>
     </div>
   );

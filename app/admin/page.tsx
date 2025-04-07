@@ -1,5 +1,7 @@
-"use client";
+"use client"
 
+import { ObjectId } from "mongodb";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -24,8 +26,19 @@ import { AdminVendorApprovals } from "@/components/admin/vendor-approvals";
 import { useState, useEffect } from "react";
 import { IVendor } from "@/models/Vendor";
 
+interface IActivity {
+  _id: ObjectId
+  user_name: string,
+  action: string
+  created_at: Date
+}
+
 export default function AdminDashboard() {
+  const router = useRouter()
   const [InactiveVendor, setInactiveVendor] = useState<IVendor[] | null>(null);
+  const [activeVendor, setActiveVendor] = useState<IVendor[] | null>(null);
+  const [recentActivity, setRecentActivity] = useState<IActivity[] | null>(null);
+  const [totalUsers, setTotalUSers] = useState(0)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -34,6 +47,9 @@ export default function AdminDashboard() {
 
       if (res.ok) {
         setInactiveVendor(data.inactiveVendors);
+        setActiveVendor(data.activeVendors);
+        setRecentActivity(data.recentActivity);
+        setTotalUSers(data.totalUsers);
       } else {
         setInactiveVendor(null);
       }
@@ -42,7 +58,9 @@ export default function AdminDashboard() {
     fetchUser();
   }, []);
 
-  function newBazaarEvent(): void {}
+  function newBazaarEvent(): void {
+    router.push("admin/events/create")
+  }
 
   return (
     <div className="space-y-6">
@@ -88,7 +106,7 @@ export default function AdminDashboard() {
             <Store className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">124</div>
+            <div className="text-2xl font-bold">{activeVendor?.length}</div>
             <p className="text-xs text-muted-foreground flex items-center mt-1">
               <span className="text-green-500 flex items-center">
                 <ArrowUpRight className="h-3 w-3 mr-1" /> 12%
@@ -117,7 +135,7 @@ export default function AdminDashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12,234</div>
+            <div className="text-2xl font-bold">{totalUsers}</div>
             <p className="text-xs text-muted-foreground flex items-center mt-1">
               <span className="text-green-500 flex items-center">
                 <ArrowUpRight className="h-3 w-3 mr-1" /> 4.3%
@@ -184,7 +202,7 @@ export default function AdminDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <AdminRecentActivity />
+            <AdminRecentActivity activities={recentActivity} />
           </CardContent>
         </Card>
       </div>

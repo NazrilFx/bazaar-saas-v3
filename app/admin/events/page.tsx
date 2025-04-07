@@ -1,11 +1,15 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AdminEventsList } from "@/components/admin/events-list"
 import { Filter, Plus, Search } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export default function AdminEventsPage() {
+  const router = useRouter()
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -14,7 +18,7 @@ export default function AdminEventsPage() {
           <p className="text-muted-foreground">Manage bazaar events and vendor participation</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button>
+          <Button onClick={() => {router.push("events/create")}}>
             <Plus className="mr-2 h-4 w-4" />
             Create New Event
           </Button>

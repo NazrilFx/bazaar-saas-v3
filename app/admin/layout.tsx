@@ -61,8 +61,9 @@ interface Admin {
   created_at: string;
 }
 
-export default function AdminLayout({children,}: Readonly<{children: React.ReactNode;
-}>) {
+export default function AdminLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -89,7 +90,21 @@ export default function AdminLayout({children,}: Readonly<{children: React.React
   }, []);
 
   if (loading) return <p>Loading...</p>;
-  if (!admin) return <p>admin not found</p>;
+  if (!admin)
+    return (
+      <p>
+        admin not found please{" "}
+        <button
+          onClick={() => {
+            window.location.href = "/api/auth-admin/logout"
+          }}
+          className="text-blue-500"
+        >
+          Click here
+        </button>{" "}
+        to logout and relog...
+      </p>
+    );
 
   return (
     <DashboardLayout
