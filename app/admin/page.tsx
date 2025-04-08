@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { ObjectId } from "mongodb";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
   ArrowUpRight,
+  ArrowDownRight,
   CalendarDays,
   CheckCircle2,
   Clock,
@@ -27,18 +28,29 @@ import { useState, useEffect } from "react";
 import { IVendor } from "@/models/Vendor";
 
 interface IActivity {
-  _id: ObjectId
-  user_name: string,
-  action: string
-  created_at: Date
+  _id: ObjectId;
+  user_name: string;
+  action: string;
+  created_at: Date;
 }
 
 export default function AdminDashboard() {
-  const router = useRouter()
+  const router = useRouter();
+  const [activeEvents, setActiveEvents] = useState(0);
+  const [vendorGrowth, setVendorGrowth] = useState(0);
+  const [isVendorGrowth, setIsVendorGrowth] = useState(false);
+  const [userGrowth, setUserGrowth] = useState(0);
+  const [isUserGrowth, setIsUserGrowth] = useState(false);
+  const [upcomingEvents, setUpcomingEvents] = useState(0);
+  const [daysUntil, setDaysUntil] = useState(0);
   const [InactiveVendor, setInactiveVendor] = useState<IVendor[] | null>(null);
   const [activeVendor, setActiveVendor] = useState<IVendor[] | null>(null);
-  const [recentActivity, setRecentActivity] = useState<IActivity[] | null>(null);
-  const [totalUsers, setTotalUSers] = useState(0)
+  const [recentActivity, setRecentActivity] = useState<IActivity[] | null>(
+    null
+  );
+  const [totalUsers, setTotalUSers] = useState(0);
+  const [totalUsersLastMonth, setTotalUSersLastMonth] = useState(0);
+  const [activeVendorsLastMonth, setActiveVendorsLastMonth] = useState(0);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -50,6 +62,11 @@ export default function AdminDashboard() {
         setActiveVendor(data.activeVendors);
         setRecentActivity(data.recentActivity);
         setTotalUSers(data.totalUsers);
+        setActiveEvents(data.activeEvents);
+        setUpcomingEvents(data.upcomingEvents);
+        setDaysUntil(data.daysUntil);
+        setTotalUSersLastMonth(data.totalUsersLastMonth);
+        setActiveVendorsLastMonth(data.activeVendorsLastMonth);
       } else {
         setInactiveVendor(null);
       }
@@ -58,8 +75,30 @@ export default function AdminDashboard() {
     fetchUser();
   }, []);
 
+  useEffect(() => {
+    const growth =
+      totalUsersLastMonth === 0
+        ? 100
+        : ((totalUsers - totalUsersLastMonth) / totalUsersLastMonth) * 100;
+
+    setUserGrowth(growth);
+    setIsUserGrowth(growth >= 0);
+  }, [totalUsers, totalUsersLastMonth]);
+
+  useEffect(() => {
+    const vendorCount = activeVendor?.length ?? 0; // fallback jadi 0 jika undefined
+
+    const growth =
+      activeVendorsLastMonth === 0
+        ? 100
+        : ((vendorCount - activeVendorsLastMonth) / activeVendorsLastMonth) * 100;
+
+    setVendorGrowth(growth);
+    setIsVendorGrowth(growth >= 0);
+  }, [activeVendor, activeVendorsLastMonth]);
+
   function newBazaarEvent(): void {
-    router.push("admin/events/create")
+    router.push("admin/events/create");
   }
 
   return (
@@ -70,7 +109,8 @@ export default function AdminDashboard() {
             Dashboard Overview
           </h2>
           <p className="text-muted-foreground">
-            Welcome back! Here&apos;s what&apos;s happening with your bazaar ecosystem.
+            Welcome back! Here&apos;s what&apos;s happening with your bazaar
+            ecosystem.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -108,8 +148,17 @@ export default function AdminDashboard() {
           <CardContent>
             <div className="text-2xl font-bold">{activeVendor?.length}</div>
             <p className="text-xs text-muted-foreground flex items-center mt-1">
-              <span className="text-green-500 flex items-center">
-                <ArrowUpRight className="h-3 w-3 mr-1" /> 12%
+              <span
+                className={`${
+                  isVendorGrowth ? "text-green-500" : "text-red-500"
+                } flex items-center`}
+              >
+                {isVendorGrowth ? (
+                  <ArrowUpRight className="h-3 w-3 mr-1" />
+                ) : (
+                  <ArrowDownRight className="h-3 w-3 mr-1" />
+                )}
+                {Math.abs(vendorGrowth).toFixed(2)}%
               </span>
               <span className="ml-1">from last month</span>
             </p>
@@ -122,9 +171,9 @@ export default function AdminDashboard() {
             <CalendarDays className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8</div>
+            <div className="text-2xl font-bold">{activeEvents}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              3 upcoming in next 30 days
+              {upcomingEvents} upcoming in next {daysUntil} days
             </p>
           </CardContent>
         </Card>
@@ -137,8 +186,17 @@ export default function AdminDashboard() {
           <CardContent>
             <div className="text-2xl font-bold">{totalUsers}</div>
             <p className="text-xs text-muted-foreground flex items-center mt-1">
-              <span className="text-green-500 flex items-center">
-                <ArrowUpRight className="h-3 w-3 mr-1" /> 4.3%
+              <span
+                className={`${
+                  isUserGrowth ? "text-green-500" : "text-red-500"
+                } flex items-center`}
+              >
+                {isUserGrowth ? (
+                  <ArrowUpRight className="h-3 w-3 mr-1" />
+                ) : (
+                  <ArrowDownRight className="h-3 w-3 mr-1" />
+                )}
+                {Math.abs(userGrowth).toFixed(2)}%
               </span>
               <span className="ml-1">from last month</span>
             </p>

@@ -6,6 +6,9 @@ import Link from "next/link";
 import { IAdmin } from "@/models/Admin";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useParams } from "next/navigation";
+import { IEvent } from "@/models/Event";
+import { ObjectId } from "mongodb";
 
 interface SimpleUser {
   _id: string;
@@ -15,8 +18,9 @@ interface SimpleUser {
 export default function SignupPage() {
   const [selectedVendorIds, setSelectedVendorIds] = useState<string[]>([]);
   const [selectedStoresIds, setSelectedStoresIds] = useState<string[]>([]);
-  const [vendors, setVendors] = useState<SimpleUser[]>([]);
-  const [stores, setStores] = useState<SimpleUser[]>([]);
+  const [allVendors, setAllVendors] = useState<SimpleUser[]>([]);
+  const [allStores, setAllStores] = useState<SimpleUser[]>([]);
+  const [event, setEvent] = useState<IEvent | null>(null);
   const [admin, setAdmin] = useState<IAdmin | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -26,17 +30,20 @@ export default function SignupPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [csrfToken, setCsrfToken] = useState("");
+  const params = useParams();
+  const id = params.id;
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/admin/vendors-stores"); // Fetch dari API Next.js
+        const res = await fetch(`/api/events/${id}`); // Fetch dari API Next.js
         const data = await res.json();
 
         if (res.ok) {
           setAdmin(data.admin);
-          setVendors(data.vendors);
-          setStores(data.stores);
+          setEvent(data.event)
+          setAllVendors(data.vendors);
+          setAllStores(data.stores);
         } else {
           setAdmin(null);
         }
@@ -50,10 +57,22 @@ export default function SignupPage() {
       .then((data) => setCsrfToken(data.csrfToken));
 
     fetchUser();
+
   }, []);
 
+  useEffect(() => { 
+    if (event) {
+      setName(event.name)
+      setDescription(event.description || "")
+      setStartDate(event.start_date)
+      setEndDate(event.end_date)
+      setLocation(event.location || "")
+      setSelectedVendorIds(event.vendorsId?.map((v) => v.toString()) || []);
+      setSelectedStoresIds(event.storesId?.map((v) => v.toString()) || []);
+    }
+  }, [event]);
+
   if (admin == null) {
-    console.log(admin)
     return <div>Sorry you don&apos;t allow to access this page</div>;
   }
 
@@ -64,10 +83,11 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/events/create", {
+      const res = await fetch("/api/events/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          id,
           name,
           description,
           selectedVendorIds,
@@ -82,21 +102,17 @@ export default function SignupPage() {
         redirect: "manual",
       });
 
+      const data = await res.json();
+
       // Cek apakah response adalah JSON
       const contentType = res.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
         throw new Error("Server returned an invalid response");
       }
 
-      const data = await res.json();
-
       if (!res.ok) throw new Error(data.message || "Create failed");
 
-      setMessage("New Event has been made");
-      setName("")
-      setDescription("")
-      setStartDate(null)
-      setEndDate(null)
+      setMessage("Event has been update");
     } catch (error: unknown) {
       let errorMessage = "Internal Server Error";
 
@@ -105,7 +121,7 @@ export default function SignupPage() {
       }
 
       setMessage(errorMessage);
-      console.error("Create error :", error);
+      console.error("Update error :", error);
     } finally {
       setLoading(false);
     }
@@ -118,7 +134,7 @@ export default function SignupPage() {
           <ArrowLeft></ArrowLeft>
         </Link>
         <h2 className="text-2xl font-bold text-center mb-4">
-          Create a new Bazaar Event
+          Update Event <span className="text-blue-500">{event?.name}</span>
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -178,7 +194,7 @@ export default function SignupPage() {
           <div className="mb-4">
             <label className="block text-gray-500 mb-1">Select Vendors</label>
             <div className="border rounded-lg px-3 py-2 bg-white max-h-60 overflow-y-auto space-y-2">
-              {vendors.map((vendor) => (
+              {allVendors.map((vendor) => (
                 <div key={vendor._id} className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -203,7 +219,7 @@ export default function SignupPage() {
           <div className="mb-4">
             <label className="block text-gray-500 mb-1">Select Stores</label>
             <div className="border rounded-lg px-3 py-2 bg-white max-h-60 overflow-y-auto space-y-2">
-              {stores.map((store) => (
+              {allStores.map((store) => (
                 <div key={store._id} className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -243,7 +259,7 @@ export default function SignupPage() {
             disabled={loading}
             className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
           >
-            {loading ? "Processing..." : "Create"}
+            {loading ? "Processing..." : "Update"}
           </button>
         </form>
       </div>
