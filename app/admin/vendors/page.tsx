@@ -13,9 +13,109 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminVendorsList } from "@/components/admin/vendors-list";
 import { Filter, Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { IVendor } from "@/models/Vendor";
+import { ObjectId } from "mongodb";
+
+export interface IVendorWithStoreCount extends IVendor {
+  id: ObjectId;
+  storeCount: number;
+}
 
 export default function VendorManagement() {
   const router = useRouter();
+  const [vendors, setVendors] = useState<IVendorWithStoreCount[] | null>(null);
+  const [filteredVendors, setFilteredVendors] = useState<
+    IVendorWithStoreCount[] | null
+  >(null);
+  const [csrfToken, setCsrfToken] = useState("");
+
+  const handleSearch = (query: string) => {
+    if (!vendors) return;
+
+    const filtered = vendors.filter((vendor) =>
+      vendor.name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    setFilteredVendors(filtered);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch("/api/admin/vendors"); // Fetch dari API Next.js
+      const data = await res.json();
+
+      if (res.ok) {
+        setVendors(data.vendors);
+      } else {
+        setVendors(null);
+      }
+
+      fetch("/api/csrf")
+        .then((res) => res.json())
+        .then((data) => setCsrfToken(data.csrfToken));
+    };
+
+    fetchData();
+  }, []);
+
+  const deactive = async (vendorId: string) => {
+    try {
+      const res = await fetch("/api/admin/vendors/deactive", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          // kirim data yang dibutuhkan untuk mengaktifkan vendor
+          vendorId,
+          csrfToken,
+        }),
+      });
+
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Server returned an invalid response");
+      }
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Activate failed");
+      window.location.reload();
+    } catch (error: unknown) {
+      let errorMessage = "Internal Server Error";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      console.error("Activate error:", error);
+    }
+  };
+
+  const activate = async (vendorId: string) => {
+    try {
+      const res = await fetch("/api/admin/vendors/activate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          // kirim data yang dibutuhkan untuk mengaktifkan vendor
+          vendorId,
+          csrfToken,
+        }),
+      });
+
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Server returned an invalid response");
+      }
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Activate failed");
+      window.location.reload();
+    } catch (error: unknown) {
+      let errorMessage = "Internal Server Error";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      console.error("Activate error:", error);
+    }
+  };
 
   const handleRedirect = () => {
     router.push("/signup-vendor"); // Berfungsi di App Router
@@ -53,6 +153,9 @@ export default function VendorManagement() {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
+                  onChange={(e) => {
+                    handleSearch(e.target.value);
+                  }}
                   placeholder="Search vendors..."
                   className="pl-8 w-[200px] md:w-[300px]"
                 />
@@ -71,13 +174,28 @@ export default function VendorManagement() {
               <TabsTrigger value="inactive">Inactive</TabsTrigger>
             </TabsList>
             <TabsContent value="active">
-              <AdminVendorsList status="active" />
+              <AdminVendorsList
+                status="active"
+                vendors={filteredVendors ?? []}
+                deactive={deactive}
+                activate={activate}
+              />
             </TabsContent>
             <TabsContent value="pending">
-              <AdminVendorsList status="pending" />
+              <AdminVendorsList
+                status="pending"
+                vendors={[]}
+                deactive={deactive}
+                activate={activate}
+              />
             </TabsContent>
             <TabsContent value="inactive">
-              <AdminVendorsList status="inactive" />
+              <AdminVendorsList
+                status="inactive"
+                vendors={filteredVendors ?? []}
+                deactive={deactive}
+                activate={activate}
+              />
             </TabsContent>
           </Tabs>
         </CardContent>

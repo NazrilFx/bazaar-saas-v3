@@ -12,113 +12,108 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { IVendorWithStoreCount } from "@/app/admin/vendors/page"
+import dayjs from "dayjs"
 
-interface Vendor {
-  id: string
-  name: string
-  email: string
-  phone: string
-  businessType: string
-  storeCount: number
-  status: "active" | "pending" | "inactive"
-  joinedDate: string
-  avatar?: string
-}
-
-const vendors: Record<string, Vendor[]> = {
-  active: [
-    {
-      id: "v1",
-      name: "Green Earth Organics",
-      email: "contact@greenearthorganics.com",
-      phone: "+1 (555) 123-4567",
-      businessType: "Food & Beverages",
-      storeCount: 3,
-      status: "active",
-      joinedDate: "Jun 15, 2023",
-      avatar: "/placeholder.svg?height=40&width=40&text=GEO",
-    },
-    {
-      id: "v2",
-      name: "Handmade Treasures",
-      email: "info@handmadetreasures.com",
-      phone: "+1 (555) 234-5678",
-      businessType: "Crafts & Handmade",
-      storeCount: 2,
-      status: "active",
-      joinedDate: "Jul 3, 2023",
-      avatar: "/placeholder.svg?height=40&width=40&text=HT",
-    },
-    {
-      id: "v3",
-      name: "Vintage Collectibles",
-      email: "sales@vintagecollectibles.com",
-      phone: "+1 (555) 345-6789",
-      businessType: "Antiques & Collectibles",
-      storeCount: 1,
-      status: "active",
-      joinedDate: "Aug 12, 2023",
-      avatar: "/placeholder.svg?height=40&width=40&text=VC",
-    },
-    {
-      id: "v4",
-      name: "Artisan Bakery",
-      email: "hello@artisanbakery.com",
-      phone: "+1 (555) 456-7890",
-      businessType: "Food & Beverages",
-      storeCount: 4,
-      status: "active",
-      joinedDate: "May 22, 2023",
-      avatar: "/placeholder.svg?height=40&width=40&text=AB",
-    },
-  ],
-  pending: [
-    {
-      id: "v5",
-      name: "Eco-Friendly Goods",
-      email: "info@ecofriendlygoods.com",
-      phone: "+1 (555) 567-8901",
-      businessType: "Sustainable Products",
-      storeCount: 0,
-      status: "pending",
-      joinedDate: "Sep 5, 2023",
-      avatar: "/placeholder.svg?height=40&width=40&text=EFG",
-    },
-    {
-      id: "v6",
-      name: "Gourmet Spices",
-      email: "sales@gourmetspices.com",
-      phone: "+1 (555) 678-9012",
-      businessType: "Food & Beverages",
-      storeCount: 0,
-      status: "pending",
-      joinedDate: "Sep 8, 2023",
-      avatar: "/placeholder.svg?height=40&width=40&text=GS",
-    },
-  ],
-  inactive: [
-    {
-      id: "v7",
-      name: "Seasonal Decor",
-      email: "contact@seasonaldecor.com",
-      phone: "+1 (555) 789-0123",
-      businessType: "Home & Decor",
-      storeCount: 1,
-      status: "inactive",
-      joinedDate: "Apr 10, 2023",
-      avatar: "/placeholder.svg?height=40&width=40&text=SD",
-    },
-  ],
-}
+// const vendors: Record<string, Vendor[]> = {
+//   active: [
+//     {
+//       id: "v1",
+//       name: "Green Earth Organics",
+//       email: "contact@greenearthorganics.com",
+//       phone: "+1 (555) 123-4567",
+//       businessType: "Food & Beverages",
+//       storeCount: 3,
+//       status: "active",
+//       joinedDate: "Jun 15, 2023",
+//       avatar: "/placeholder.svg?height=40&width=40&text=GEO",
+//     },
+//     {
+//       id: "v2",
+//       name: "Handmade Treasures",
+//       email: "info@handmadetreasures.com",
+//       phone: "+1 (555) 234-5678",
+//       businessType: "Crafts & Handmade",
+//       storeCount: 2,
+//       status: "active",
+//       joinedDate: "Jul 3, 2023",
+//       avatar: "/placeholder.svg?height=40&width=40&text=HT",
+//     },
+//     {
+//       id: "v3",
+//       name: "Vintage Collectibles",
+//       email: "sales@vintagecollectibles.com",
+//       phone: "+1 (555) 345-6789",
+//       businessType: "Antiques & Collectibles",
+//       storeCount: 1,
+//       status: "active",
+//       joinedDate: "Aug 12, 2023",
+//       avatar: "/placeholder.svg?height=40&width=40&text=VC",
+//     },
+//     {
+//       id: "v4",
+//       name: "Artisan Bakery",
+//       email: "hello@artisanbakery.com",
+//       phone: "+1 (555) 456-7890",
+//       businessType: "Food & Beverages",
+//       storeCount: 4,
+//       status: "active",
+//       joinedDate: "May 22, 2023",
+//       avatar: "/placeholder.svg?height=40&width=40&text=AB",
+//     },
+//   ],
+//   pending: [
+//     {
+//       id: "v5",
+//       name: "Eco-Friendly Goods",
+//       email: "info@ecofriendlygoods.com",
+//       phone: "+1 (555) 567-8901",
+//       businessType: "Sustainable Products",
+//       storeCount: 0,
+//       status: "pending",
+//       joinedDate: "Sep 5, 2023",
+//       avatar: "/placeholder.svg?height=40&width=40&text=EFG",
+//     },
+//     {
+//       id: "v6",
+//       name: "Gourmet Spices",
+//       email: "sales@gourmetspices.com",
+//       phone: "+1 (555) 678-9012",
+//       businessType: "Food & Beverages",
+//       storeCount: 0,
+//       status: "pending",
+//       joinedDate: "Sep 8, 2023",
+//       avatar: "/placeholder.svg?height=40&width=40&text=GS",
+//     },
+//   ],
+//   inactive: [
+//     {
+//       id: "v7",
+//       name: "Seasonal Decor",
+//       email: "contact@seasonaldecor.com",
+//       phone: "+1 (555) 789-0123",
+//       businessType: "Home & Decor",
+//       storeCount: 1,
+//       status: "inactive",
+//       joinedDate: "Apr 10, 2023",
+//       avatar: "/placeholder.svg?height=40&width=40&text=SD",
+//     },
+//   ],
+// }
 
 interface AdminVendorsListProps {
-  status: "active" | "pending" | "inactive"
+  status: "active" | "pending" | "inactive",
+  vendors: IVendorWithStoreCount[],
+  deactive: (vendorId: string) => void,
+  activate: (vendorId: string) => void,
 }
 
-export function AdminVendorsList({ status }: AdminVendorsListProps) {
-  const vendorsList = vendors[status] || []
+export function AdminVendorsList({ status, vendors, deactive, activate }: AdminVendorsListProps) {
+  const filteredVendors = vendors.filter((vendor) =>
+    status === "active" ? vendor.verified === true : vendor.verified === false
+  );
 
-  if (vendorsList.length === 0) {
+  if (filteredVendors.length === 0) {
     return (
       <Card className="flex flex-col items-center justify-center p-8 text-center">
         <Store className="h-12 w-12 text-muted-foreground mb-4" />
@@ -148,39 +143,39 @@ export function AdminVendorsList({ status }: AdminVendorsListProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {vendorsList.map((vendor) => (
-          <TableRow key={vendor.id}>
+        {filteredVendors.map((vendor) => (
+          <TableRow key={vendor._id.toString()}>
             <TableCell>
               <div className="flex items-center gap-3">
                 <Avatar>
-                  <AvatarImage src={vendor.avatar} alt={vendor.name} />
+                  <AvatarImage src={vendor.profile_image} alt={vendor.name} />
                   <AvatarFallback>{vendor.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
                   <div className="font-medium">{vendor.name}</div>
-                  <div className="text-xs text-muted-foreground">ID: {vendor.id}</div>
+                  <div className="text-xs text-muted-foreground">ID: {vendor._id.toString()}</div>
                 </div>
               </div>
             </TableCell>
-            <TableCell>{vendor.businessType}</TableCell>
+            <TableCell>{vendor.business_type}</TableCell>
             <TableCell>
               <div className="text-sm">{vendor.email}</div>
               <div className="text-xs text-muted-foreground">{vendor.phone}</div>
             </TableCell>
             <TableCell>{vendor.storeCount}</TableCell>
-            <TableCell>{vendor.joinedDate}</TableCell>
+            <TableCell>{dayjs(vendor.created_at).format("dddd, DD MMMM YYYY")}</TableCell>
             <TableCell>
               <Badge
                 variant="outline"
                 className={
-                  vendor.status === "active"
+                  status === "active"
                     ? "bg-green-50 text-green-700 border-green-200"
-                    : vendor.status === "pending"
+                    : status === "pending"
                       ? "bg-amber-50 text-amber-700 border-amber-200"
                       : "bg-gray-50 text-gray-700 border-gray-200"
                 }
               >
-                {vendor.status}
+                {status}
               </Badge>
             </TableCell>
             <TableCell className="text-right">
@@ -221,10 +216,10 @@ export function AdminVendorsList({ status }: AdminVendorsListProps) {
                       <DropdownMenuItem>View Stores</DropdownMenuItem>
                       <DropdownMenuItem>Edit Vendor</DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      {vendor.status === "active" ? (
-                        <DropdownMenuItem className="text-red-600">Deactivate Vendor</DropdownMenuItem>
+                      {status === "active" ? (
+                        <DropdownMenuItem onClick={() => deactive(vendor._id.toString())} className="text-red-600">Deactivate Vendor</DropdownMenuItem>
                       ) : (
-                        <DropdownMenuItem className="text-green-600">Activate Vendor</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => activate(vendor._id.toString())} className="text-green-600">Activate Vendor</DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
