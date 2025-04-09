@@ -47,6 +47,7 @@ export default function VendorManagement() {
 
       if (res.ok) {
         setVendors(data.vendors);
+        setFilteredVendors(data.vendors)
       } else {
         setVendors(null);
       }

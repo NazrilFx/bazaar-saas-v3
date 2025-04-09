@@ -8,7 +8,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useParams } from "next/navigation";
 import { IEvent } from "@/models/Event";
-import { ObjectId } from "mongodb";
 
 interface SimpleUser {
   _id: string;

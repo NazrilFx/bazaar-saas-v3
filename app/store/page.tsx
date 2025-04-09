@@ -1,3 +1,5 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -5,8 +7,10 @@ import { ArrowUpRight, CreditCard, DollarSign, Package, Plus, ShoppingBag } from
 import { StoreProductsList } from "@/components/store/products-list"
 import { StoreRecentOrders } from "@/components/store/recent-orders"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function StoreDashboard() {
+  const router = useRouter()
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -21,7 +25,7 @@ export default function StoreDashboard() {
               Open POS
             </Button>
           </Link>
-          <Button>
+          <Button onClick={() => {router.push("/store/products/create")}}>
             <Plus className="mr-2 h-4 w-4" />
             Add New Product
           </Button>
@@ -91,13 +95,13 @@ export default function StoreDashboard() {
               <CardTitle>Products</CardTitle>
               <CardDescription>Manage your product listings and inventory</CardDescription>
             </div>
-            <Button variant="outline" size="sm">
+            <Button onClick={() => {router.push("/store/products/create")}} variant="outline" size="sm">
               <Plus className="mr-2 h-4 w-4" />
               Add Product
             </Button>
           </CardHeader>
           <CardContent>
-            <StoreProductsList status="all" />
+            <StoreProductsList status="all" products={[]} edit={() => {}} updateStock={() => {}} editPrice={() => {}} />
           </CardContent>
           <CardFooter>
             <Button variant="outline" className="w-full">

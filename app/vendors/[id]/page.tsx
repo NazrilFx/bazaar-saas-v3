@@ -8,7 +8,6 @@ import { VendorProducts } from "@/components/vendor-products"
 import { VendorTransactions } from "@/components/vendor-transactions"
 import { VendorStats } from "@/components/vendor-stats"
 
-
 export default async function VendorDetailsPage({ params }: {params: Promise<{id : string}>}) {
 
   const { id } = await params

@@ -10,7 +10,6 @@ import Admin from "@/models/Admin";
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB();
-    const { id } = await params;
     const token = req.cookies.get("admin_token")?.value;
 
     if (!token) return NextResponse.json({ admin: token }, { status: 401 });

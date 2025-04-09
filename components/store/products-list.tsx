@@ -32,11 +32,17 @@ interface IProduct {
 interface StoreProductsListProps {
   status: "all" | "in_stock" | "low_stock" | "out_of_stock";
   products: IProduct[];
+  edit: (id : string) => void
+  updateStock: (id : string) => void
+  editPrice: (id : string) => void
 }
 
 export function StoreProductsList({
   status,
   products,
+  edit,
+  updateStock,
+  editPrice
 }: StoreProductsListProps) {
   const productsList =
     status === "all"
@@ -122,7 +128,7 @@ export function StoreProductsList({
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-2">
-                  <Button size="icon" variant="ghost">
+                  <Button onClick={() => edit(product._id.toString())} size="icon" variant="ghost">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <DropdownMenu>
@@ -135,8 +141,8 @@ export function StoreProductsList({
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuItem>Update Stock</DropdownMenuItem>
-                      <DropdownMenuItem>Edit Price</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => updateStock(product._id.toString())}>Update Stock</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => editPrice(product._id.toString())}>Edit Price</DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-red-600">
                         Remove Product

@@ -34,6 +34,17 @@ export default function StoreProductsPage() {
 
   }, []);
 
+  const edit = async (id : string) => {
+    router.push(`products/edit/${id}`)
+  }
+
+  const updateStock = async (id : string) => {
+    
+  }
+
+  const editPrice = async (id : string) => {
+
+  }
 
   return (
     <div className="space-y-6">
@@ -81,16 +92,16 @@ export default function StoreProductsPage() {
               <TabsTrigger value="out_of_stock">Out of Stock</TabsTrigger>
             </TabsList>
             <TabsContent value="all">
-              <StoreProductsList status="all" products={product ?? []} />
+              <StoreProductsList status="all" products={product ?? []} edit={edit} updateStock={updateStock} editPrice={editPrice} />
             </TabsContent>
             <TabsContent value="in_stock">
-              <StoreProductsList status="in_stock" products={product ?? []} />
+              <StoreProductsList status="in_stock" products={product ?? []} edit={edit} updateStock={updateStock} editPrice={editPrice} />
             </TabsContent>
             <TabsContent value="low_stock">
-              <StoreProductsList status="low_stock" products={product ?? []} />
+              <StoreProductsList status="low_stock" products={product ?? []} edit={edit} updateStock={updateStock} editPrice={editPrice} />
             </TabsContent>
             <TabsContent value="out_of_stock">
-              <StoreProductsList status="out_of_stock" products={product ?? []} />
+              <StoreProductsList status="out_of_stock" products={product ?? []} edit={edit} updateStock={updateStock} editPrice={editPrice} />
             </TabsContent>
           </Tabs>
         </CardContent>

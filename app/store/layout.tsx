@@ -104,7 +104,7 @@ export default function StoreLayout({
       navItems={navItems}
       theme="store"
       title="Store Dashboard"
-      subtitle="Organic Delights at Summer Food Festival"
+      subtitle={`${store.name} at Summer Food Festival`}
       userRole={`Vendor ${vendorName}`}
       userName={store.name}
       logout="/api/auth-store/logout"

@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { IProduct } from "@/models/Product";
 import { Trash2 } from "lucide-react";
 
 interface ICategory {
@@ -12,8 +14,7 @@ interface ICategory {
 
 export default function SignupPage() {
   const [categories, setCategories] = useState<ICategory[] | null>(null);
-  const [storeId, setStoreId] = useState<string | null>(null);
-  const [vendorId, setVendorId] = useState<string | null>(null);
+  const [product, setProduct] = useState<IProduct | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [stock, setStock] = useState<number | null>(null);
@@ -23,21 +24,23 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [csrfToken, setCsrfToken] = useState("");
   const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const params = useParams();
+  const id = params.id;
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/product/necessary-data"); // Fetch dari API Next.js
+        const res = await fetch(`/api/product/${id}`); // Fetch dari API Next.js
         const data = await res.json();
 
         if (res.ok) {
-          setStoreId(data.store_id);
-          setVendorId(data.vendor_id);
           setCategories(data.categories);
+          setProduct(data.product);
+          setCategory(data.productCategory);
         } else {
-          setStoreId(null);
-          setVendorId(null);
           setCategories(null);
+          setProduct(null);
+          setCategory("");
         }
       } catch (error) {
         console.log(error);
@@ -51,9 +54,17 @@ export default function SignupPage() {
     fetchUser();
   }, []);
 
-  if (storeId == null || vendorId == null) {
-    return <div>Sorry you don&apos;t allow to access this page</div>;
-  }
+  useEffect(() => {
+    if (product == null) {
+      return;
+    }
+
+    setName(product.name);
+    setDescription(product.description);
+    setStock(product.stock);
+    setPrice(product.price);
+    setImageBase64(product.image);
+  }, [product]);
 
   if (categories == null) {
     return <div>Categories not found</div>;
@@ -132,8 +143,6 @@ export default function SignupPage() {
           stock,
           image: imageBase64,
           category_id: category,
-          vendor_id: vendorId,
-          store_id: storeId,
           csrfToken,
         }),
         redirect: "manual",
@@ -177,7 +186,7 @@ export default function SignupPage() {
           <ArrowLeft></ArrowLeft>
         </Link>
         <h2 className="text-2xl font-bold text-center mb-4">
-          Create a new product
+          Update Product {id}
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -210,7 +219,7 @@ export default function SignupPage() {
           </div>
           {imageBase64 && (
             <>
-              <img src={imageBase64} alt="Resized preview"/>
+              <img src={imageBase64} alt="Resized preview" />
               <button
                 onClick={() => setImageBase64("")}
                 className="p-3 text-red-600 bg-red-100 hover:bg-red-300 rounded-full transition"
@@ -248,7 +257,7 @@ export default function SignupPage() {
           <div className="mb-4">
             <label className="block text-gray-500">Select Category</label>
             <select
-              value={category}
+              value={category ?? undefined}
               onChange={(e) => setCategory(e.target.value)}
               required
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200 bg-white"
