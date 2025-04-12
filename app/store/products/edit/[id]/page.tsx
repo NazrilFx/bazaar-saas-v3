@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { IProduct } from "@/models/Product";
 import { Trash2 } from "lucide-react";
+import Loading from "@/components/loading";
 
 interface ICategory {
   _id: string;
@@ -14,6 +15,7 @@ interface ICategory {
 
 export default function SignupPage() {
   const [categories, setCategories] = useState<ICategory[] | null>(null);
+  const [isOwner, setIsOwner] = useState(false);
   const [product, setProduct] = useState<IProduct | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -21,7 +23,7 @@ export default function SignupPage() {
   const [price, setPrice] = useState<number | null>(null);
   const [category, setCategory] = useState("");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [csrfToken, setCsrfToken] = useState("");
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const params = useParams();
@@ -36,11 +38,10 @@ export default function SignupPage() {
         if (res.ok) {
           setCategories(data.categories);
           setProduct(data.product);
-          setCategory(data.productCategory);
+          setIsOwner(data.isOwner);
         } else {
           setCategories(null);
           setProduct(null);
-          setCategory("");
         }
       } catch (error) {
         console.log(error);
@@ -51,7 +52,7 @@ export default function SignupPage() {
       .then((res) => res.json())
       .then((data) => setCsrfToken(data.csrfToken));
 
-    fetchUser();
+    fetchUser().then(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -64,7 +65,24 @@ export default function SignupPage() {
     setStock(product.stock);
     setPrice(product.price);
     setImageBase64(product.image);
+    setCategory(product.category_id.toString())
   }, [product]);
+
+  // useEffect(() => {
+  //   console.log(category);
+  // }, [category]);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (product == null && !loading) {
+    return <div>Product not found</div>;
+  }
+
+  if (!isOwner && !loading) {
+    return <div>Sorry you are not this owner of this product</div>;
+  }
 
   if (categories == null) {
     return <div>Categories not found</div>;
@@ -126,17 +144,18 @@ export default function SignupPage() {
 
     setLoading(true);
 
-    if (stock == 0 || price == 0) {
-      setMessage("Value cannot be 0");
+    if (price == 0) {
+      setMessage("Price cannot be 0");
       setLoading(false);
       return;
     }
 
     try {
-      const res = await fetch("/api/product/create", {
+      const res = await fetch("/api/product/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          id,
           name,
           description,
           price,
@@ -158,13 +177,7 @@ export default function SignupPage() {
 
       if (!res.ok) throw new Error(data.message || "Create failed");
 
-      setMessage("Product create successfullty");
-      setName("");
-      setDescription("");
-      setImageBase64("");
-      setCategory("");
-      setPrice(0);
-      setStock(0);
+      setMessage("Product update successfullty");
     } catch (error: unknown) {
       let errorMessage = "Internal Server Error";
 
@@ -232,7 +245,7 @@ export default function SignupPage() {
           <div className="mb-4">
             <label className="block text-gray-500">Price</label>
             <input
-              value={price ?? ""}
+              value={price?.toString() ?? ""}
               type="number"
               onChange={(e) =>
                 setPrice(e.target.value === "" ? null : Number(e.target.value))
@@ -241,6 +254,11 @@ export default function SignupPage() {
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200 bg-white"
             />
           </div>
+          {price && (
+            <div className="text-sm my-2 bg-blue-50">
+              Rp {new Intl.NumberFormat("id-ID").format(price)}
+            </div>
+          )}
           <div className="mb-4">
             <label className="block text-gray-500">Stock</label>
             <input
@@ -257,8 +275,10 @@ export default function SignupPage() {
           <div className="mb-4">
             <label className="block text-gray-500">Select Category</label>
             <select
-              value={category ?? undefined}
-              onChange={(e) => setCategory(e.target.value)}
+              value={category}
+              onChange={(e) => {
+                setCategory(e.target.value);
+              }}
               required
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200 bg-white"
             >
@@ -279,7 +299,7 @@ export default function SignupPage() {
             disabled={loading}
             className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
           >
-            {loading ? "Processing..." : "Create"}
+            {loading ? "Processing..." : "Save"}
           </button>
         </form>
       </div>

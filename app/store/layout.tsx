@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { IStore } from "@/models/Store";
+import Loading from "@/components/loading";
 
 const navItems = [
   {
@@ -96,7 +97,7 @@ export default function StoreLayout({
     fetchUser();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Loading/>;
   if (!store) return <p>store not found</p>;
 
   return (

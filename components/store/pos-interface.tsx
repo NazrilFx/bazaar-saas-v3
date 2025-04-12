@@ -1,134 +1,303 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, CreditCard, Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react"
-import { StorePOSProductCard } from "@/components/store/pos-product-card"
-import { StorePOSPaymentModal } from "@/components/store/pos-payment-modal"
-import { StorePOSProductDetailModal } from "@/components/store/pos-product-detail-modal"
-import Link from "next/link"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  ArrowLeft,
+  CreditCard,
+  Minus,
+  Plus,
+  ShoppingCart,
+  Trash2,
+  X,
+} from "lucide-react";
+import { StorePOSProductCard } from "@/components/store/pos-product-card";
+import { StorePOSPaymentModal } from "@/components/store/pos-payment-modal";
+import { StorePOSProductDetailModal } from "@/components/store/pos-product-detail-modal";
+import Link from "next/link";
+import Loading from "@/components/loading";
+import { loadSnapScript } from "@/utils/loadSnapScript";
+import mongoose from "mongoose";
 
-interface Product {
-  id: string
-  name: string
-  price: number
-  category: string
-  description?: string
-  image?: string
+export interface IOrderItem {
+    product_id: string;
+    name: string;
+    price: number;
+    quantity: number;
 }
 
-interface CartItem extends Product {
-  quantity: number
+export interface IProduct {
+  id: string;
+  name: string;
+  price: number;
+  category: string;
+  description?: string;
+  image?: string;
 }
 
-const categories = ["All", "Food", "Beverages", "Snacks", "Desserts"]
+interface CartItem extends IProduct {
+  quantity: number;
+}
 
 // These are products specific to this store
-const storeProducts: Product[] = [
-  {
-    id: "prod1",
-    name: "Organic Salad Bowl",
-    price: 12.99,
-    category: "Food",
-    description: "Fresh organic greens with a variety of toppings and house-made dressing.",
-    image: "/placeholder.svg?height=120&width=120&text=Salad",
-  },
-  {
-    id: "prod2",
-    name: "Fresh Fruit Smoothie",
-    price: 8.5,
-    category: "Beverages",
-    description: "Blend of seasonal fruits with yogurt and honey.",
-    image: "/placeholder.svg?height=120&width=120&text=Smoothie",
-  },
-  {
-    id: "prod3",
-    name: "Vegan Protein Bar",
-    price: 4.99,
-    category: "Snacks",
-    description: "Plant-based protein bar with nuts, seeds, and dried fruits.",
-    image: "/placeholder.svg?height=120&width=120&text=Protein+Bar",
-  },
-  {
-    id: "prod4",
-    name: "Gluten-Free Cookies",
-    price: 6.75,
-    category: "Desserts",
-    description: "Delicious cookies made with gluten-free flour and organic chocolate chips.",
-    image: "/placeholder.svg?height=120&width=120&text=Cookies",
-  },
-  {
-    id: "prod5",
-    name: "Organic Green Tea",
-    price: 5.25,
-    category: "Beverages",
-    description: "Premium organic green tea, served hot or iced.",
-    image: "/placeholder.svg?height=120&width=120&text=Tea",
-  },
-  {
-    id: "prod6",
-    name: "Avocado Toast",
-    price: 10.5,
-    category: "Food",
-    description: "Whole grain toast topped with fresh avocado, microgreens, and spices.",
-    image: "/placeholder.svg?height=120&width=120&text=Avocado+Toast",
-  },
-]
+// const storeProducts: IProduct[] = [
+//   {
+//     id: "prod1",
+//     name: "Organic Salad Bowl",
+//     price: 12.99,
+//     category: "Food",
+//     description: "Fresh organic greens with a variety of toppings and house-made dressing.",
+//     image: "/placeholder.svg?height=120&width=120&text=Salad",
+//   },
+//   {
+//     id: "prod2",
+//     name: "Fresh Fruit Smoothie",
+//     price: 8.5,
+//     category: "Beverages",
+//     description: "Blend of seasonal fruits with yogurt and honey.",
+//     image: "/placeholder.svg?height=120&width=120&text=Smoothie",
+//   },
+//   {
+//     id: "prod3",
+//     name: "Vegan Protein Bar",
+//     price: 4.99,
+//     category: "Snacks",
+//     description: "Plant-based protein bar with nuts, seeds, and dried fruits.",
+//     image: "/placeholder.svg?height=120&width=120&text=Protein+Bar",
+//   },
+//   {
+//     id: "prod4",
+//     name: "Gluten-Free Cookies",
+//     price: 6.75,
+//     category: "Desserts",
+//     description: "Delicious cookies made with gluten-free flour and organic chocolate chips.",
+//     image: "/placeholder.svg?height=120&width=120&text=Cookies",
+//   },
+//   {
+//     id: "prod5",
+//     name: "Organic Green Tea",
+//     price: 5.25,
+//     category: "Beverages",
+//     description: "Premium organic green tea, served hot or iced.",
+//     image: "/placeholder.svg?height=120&width=120&text=Tea",
+//   },
+//   {
+//     id: "prod6",
+//     name: "Avocado Toast",
+//     price: 10.5,
+//     category: "Food",
+//     description: "Whole grain toast topped with fresh avocado, microgreens, and spices.",
+//     image: "/placeholder.svg?height=120&width=120&text=Avocado+Toast",
+//   },
+// ]
 
 export function StorePOSInterface() {
-  const [activeCategory, setActiveCategory] = useState("All")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [cart, setCart] = useState<CartItem[]>([])
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const [isProductDetailOpen, setIsProductDetailOpen] = useState(false)
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [storeName, setStoreName] = useState("");
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
+  const [isProductDetailOpen, setIsProductDetailOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<IProduct[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [vendorEmail, setVendorEmail] = useState<string | null>(null);
+  const [vendorPhone, setVendorPhone] = useState<string | null>(null);
+  // const [orderItems, setOrderItems] = useState<IOrderItem[] | []>([])
 
-  const filteredProducts = storeProducts.filter(
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/store-pos/dashboard"); // Fetch dari API Next.js
+        const data = await res.json();
+
+        if (res.ok) {
+          setStoreName(data.storeName);
+          setProducts(data.products);
+          setCategories(["All", ...data.categories]);
+          setVendorEmail(data.vendorEmail);
+          setVendorPhone(data.vendorPhone);
+        } else {
+          setProducts([]);
+          setVendorEmail(null);
+          setVendorPhone(null);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchUser().then(() => setLoading(false));
+
+    loadSnapScript()
+      .then(() => setLoading(false))
+      .catch((err) => console.error(err));
+  }, []);
+
+    if (loading) {
+    return <Loading />;
+  }
+  
+  if (!loading && (!vendorEmail || !vendorPhone)) {
+    return <div>Vendor's email and phone not found</div>;
+  }  
+  const filteredProducts = products.filter(
     (product) =>
       (activeCategory === "All" || product.category === activeCategory) &&
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  const addToCart = (product: Product, quantity = 1) => {
+  const addToCart = (product: IProduct, quantity = 1) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.id === product.id)
+      const existingItem = prevCart.find((item) => item.id === product.id);
       if (existingItem) {
-        return prevCart.map((item) => (item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item))
+        return prevCart.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
       } else {
-        return [...prevCart, { ...product, quantity }]
+        return [...prevCart, { ...product, quantity }];
       }
-    })
-  }
+    });
+  };
 
   const removeFromCart = (productId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== productId))
-  }
+    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
+  };
 
   const updateQuantity = (productId: string, newQuantity: number) => {
     if (newQuantity < 1) {
-      removeFromCart(productId)
-      return
+      removeFromCart(productId);
+      return;
     }
 
-    setCart((prevCart) => prevCart.map((item) => (item.id === productId ? { ...item, quantity: newQuantity } : item)))
-  }
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item.id === productId ? { ...item, quantity: newQuantity } : item
+      )
+    );
+  };
 
   const clearCart = () => {
-    setCart([])
-  }
+    setCart([]);
+  };
 
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const tax = subtotal * 0.1 // 10% tax
-  const total = subtotal + tax
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  const tax = subtotal * 0.1; // 10% tax
+  const total = subtotal + tax;
 
-  const handleViewProductDetails = (product: Product) => {
-    setSelectedProduct(product)
-    setIsProductDetailOpen(true)
-  }
+  const handleViewProductDetails = (product: IProduct) => {
+    setSelectedProduct(product);
+    setIsProductDetailOpen(true);
+  };
+
+  const handleMidtransPay = async () => {
+    if (!vendorEmail || typeof vendorPhone !== "string") {
+      alert("email tidak ada");
+    }
+
+    if (!vendorPhone || typeof vendorPhone !== "string") {
+      alert("Nomor HP tidak valid atau tidak tersedia");
+    }
+
+    const filteredOrderItems: IOrderItem[] = cart
+  .filter((item) => item.quantity > 0) // ← filter item yang quantity > 0
+  .map((item) => ({
+    product_id: item.id.toString(),
+    name: item.name,
+    quantity: item.quantity,
+    price: item.price,
+  }));
+
+    try {
+      const res = await fetch("/api/midtrans/transaction", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: { storeName }, // name bisa diinput dari user
+          email: vendorEmail, // email user
+          phone: vendorPhone, // nomor HP user
+          tax: tax,
+          amount: total, // total pembayaran
+          items: filteredOrderItems,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error('Telah terjadi error saat membuat order : ' + data)
+      }
+
+      const createOrderRes = await fetch("/api/order/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          customer_name: storeName,
+          midtrans_token: data.token,
+          customer_email: vendorEmail,
+          status: "pending",
+          items: filteredOrderItems,
+          total_amount: total,
+          tax_amount: tax,
+          payment_method: "",
+        }),
+      });
+
+      const dataOrder = await createOrderRes.json()
+
+      if (!createOrderRes.ok) (
+        console.error('Telah terjadi error saat membuat order : ' + dataOrder)
+      )
+
+      console.log(dataOrder)
+
+      if (data.token) {
+        // Lanjutkan ke Snap Midtrans payment popup
+        window.snap.pay(data.token, {
+          onSuccess: async (result) => {
+            setCart([]);
+            console.log("Pembayaran sukses", result);
+          },
+          onPending: (result) => {
+            setCart([]);
+            console.log("Pembayaran pending", result);
+          },
+          onError: (result) => {
+            setCart([]);
+            console.log("Pembayaran gagal", result);
+          },
+          onClose: () => {
+            setCart([]);
+            console.log("Popup ditutup");
+          },
+        });
+      } else {
+        console.warn("Token tidak tersedia, response:", data);
+        alert("Gagal membuat transaksi");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+    }
+  };
 
   return (
     <div className="flex flex-col md:flex-row h-[calc(100vh-4rem)]">
@@ -157,10 +326,18 @@ export function StorePOSInterface() {
           </div>
 
           <div className="mt-4 overflow-x-auto pb-2">
-            <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
+            <Tabs
+              value={activeCategory}
+              onValueChange={setActiveCategory}
+              className="w-full"
+            >
               <TabsList className="w-full justify-start">
                 {categories.map((category) => (
-                  <TabsTrigger key={category} value={category} className="px-4 py-2">
+                  <TabsTrigger
+                    key={category}
+                    value={category}
+                    className="px-4 py-2"
+                  >
                     {category}
                   </TabsTrigger>
                 ))}
@@ -184,7 +361,8 @@ export function StorePOSInterface() {
               <ShoppingCart className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium">No Products Found</h3>
               <p className="text-sm text-muted-foreground max-w-md mt-1">
-                Try adjusting your search or filter to find what you&apos;re looking for.
+                Try adjusting your search or filter to find what you&apos;re
+                looking for.
               </p>
             </div>
           )}
@@ -222,17 +400,24 @@ export function StorePOSInterface() {
             ) : (
               <div className="space-y-4">
                 {cart.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium truncate">{item.name}</h3>
-                      <p className="text-sm text-muted-foreground">${item.price.toFixed(2)}</p>
+                      <p className="text-sm text-muted-foreground">
+                        ${item.price.toFixed(2)}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2 ml-4">
                       <Button
                         variant="outline"
                         size="icon"
                         className="h-7 w-7"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity - 1)
+                        }
                       >
                         <Minus className="h-3 w-3" />
                       </Button>
@@ -241,7 +426,9 @@ export function StorePOSInterface() {
                         variant="outline"
                         size="icon"
                         className="h-7 w-7"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity + 1)
+                        }
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
@@ -277,7 +464,8 @@ export function StorePOSInterface() {
                 className="w-full mt-4 bg-store-primary hover:bg-store-secondary text-white"
                 size="lg"
                 disabled={cart.length === 0}
-                onClick={() => setIsPaymentModalOpen(true)}
+                // onClick={() => setIsPaymentModalOpen(true)}
+                onClick={handleMidtransPay}
               >
                 <CreditCard className="mr-2 h-5 w-5" />
                 Proceed to Payment
@@ -292,8 +480,8 @@ export function StorePOSInterface() {
         onClose={() => setIsPaymentModalOpen(false)}
         total={total}
         onPaymentComplete={() => {
-          setIsPaymentModalOpen(false)
-          clearCart()
+          setIsPaymentModalOpen(false);
+          clearCart();
         }}
       />
 
@@ -304,6 +492,5 @@ export function StorePOSInterface() {
         onAddToCart={addToCart}
       />
     </div>
-  )
+  );
 }
-

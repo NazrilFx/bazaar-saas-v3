@@ -8,6 +8,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useParams } from "next/navigation";
 import { IEvent } from "@/models/Event";
+import Loading from "@/components/loading";
 
 interface SimpleUser {
   _id: string;
@@ -33,6 +34,7 @@ export default function SignupPage() {
   const id = params.id;
 
   useEffect(() => {
+    setLoading(true)
     const fetchUser = async () => {
       try {
         const res = await fetch(`/api/events/${id}`); // Fetch dari API Next.js
@@ -55,8 +57,7 @@ export default function SignupPage() {
       .then((res) => res.json())
       .then((data) => setCsrfToken(data.csrfToken));
 
-    fetchUser();
-
+    fetchUser().then(() => setLoading(false));
   }, []);
 
   useEffect(() => { 
@@ -71,7 +72,11 @@ export default function SignupPage() {
     }
   }, [event]);
 
-  if (admin == null) {
+  if (loading) {
+    return <Loading/>
+  }
+
+  if (admin == null && loading == false) {
     return <div>Sorry you don&apos;t allow to access this page</div>;
   }
 
@@ -80,6 +85,10 @@ export default function SignupPage() {
     setMessage("");
 
     setLoading(true);
+
+    if (admin == null) {
+      throw new Error("admin not found");
+    }
 
     try {
       const res = await fetch("/api/events/update", {

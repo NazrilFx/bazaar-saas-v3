@@ -42,14 +42,25 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         // Ambil semua produk dengan store_id yang dikirim lewat query
         const isOwner = store._id.toString() === product.store_id.toString(); // akan bernilai true jika store ditemukan, false jika null
         const categoriesRaw = await Category.find({}, "_id name").lean();
-        const productCategory = await Category.findById(product._id).select("name").lean()
+        const productCategory = await Category.findById(product._id).select("_id").lean()
 
         const categories = categoriesRaw.map((cat) => ({
-          id: cat._id.toString(),
+          _id: cat._id.toString(),
           name: cat.name,
         }));
     
-        return NextResponse.json({ product, isOwner, categories, productCategory });
+        return new Response(JSON.stringify({
+            product,
+            isOwner,
+            categories,
+            productCategory
+          }, null, 2), {
+            status: 200,
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+                    
     } catch (error) {
         console.error("Error fetching products:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });

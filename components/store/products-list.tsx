@@ -32,9 +32,9 @@ interface IProduct {
 interface StoreProductsListProps {
   status: "all" | "in_stock" | "low_stock" | "out_of_stock";
   products: IProduct[];
-  edit: (id : string) => void
-  updateStock: (id : string) => void
-  editPrice: (id : string) => void
+  edit: (id: string) => void;
+  updateStock: (id: string, stock: number) => void;
+  editPrice: (id: string, price: number) => void;
 }
 
 export function StoreProductsList({
@@ -42,7 +42,7 @@ export function StoreProductsList({
   products,
   edit,
   updateStock,
-  editPrice
+  editPrice,
 }: StoreProductsListProps) {
   const productsList =
     status === "all"
@@ -106,7 +106,7 @@ export function StoreProductsList({
                 </div>
               </TableCell>
               <TableCell>{product.category}</TableCell>
-              <TableCell>${product.price.toFixed(2)}</TableCell>
+              <TableCell>Rp {new Intl.NumberFormat("id-ID").format(product.price)}</TableCell>
               <TableCell>{product.stock}</TableCell>
               <TableCell>
                 <Badge
@@ -128,7 +128,11 @@ export function StoreProductsList({
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-2">
-                  <Button onClick={() => edit(product._id.toString())} size="icon" variant="ghost">
+                  <Button
+                    onClick={() => edit(product._id.toString())}
+                    size="icon"
+                    variant="ghost"
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
                   <DropdownMenu>
@@ -141,8 +145,20 @@ export function StoreProductsList({
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => updateStock(product._id.toString())}>Update Stock</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => editPrice(product._id.toString())}>Edit Price</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          updateStock(product._id.toString(), product.stock)
+                        }
+                      >
+                        Update Stock
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          editPrice(product._id.toString(), product.price)
+                        }
+                      >
+                        Update Price
+                      </DropdownMenuItem>{" "}
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-red-600">
                         Remove Product

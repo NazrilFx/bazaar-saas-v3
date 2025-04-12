@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Trash2 } from "lucide-react";
+import Loading from "@/components/loading";
 
 interface ICategory {
   _id: string;
@@ -20,7 +21,7 @@ export default function SignupPage() {
   const [price, setPrice] = useState<number | null>(null);
   const [category, setCategory] = useState("");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [csrfToken, setCsrfToken] = useState("");
   const [imageBase64, setImageBase64] = useState<string | null>(null);
 
@@ -48,10 +49,16 @@ export default function SignupPage() {
       .then((res) => res.json())
       .then((data) => setCsrfToken(data.csrfToken));
 
-    fetchUser();
+    fetchUser().then(() => {
+      setLoading(false)
+    });
   }, []);
 
-  if (storeId == null || vendorId == null) {
+  if (loading) {
+    return <Loading/>
+  }
+
+  if (storeId == null && !loading || vendorId == null && !loading) {
     return <div>Sorry you don&apos;t allow to access this page</div>;
   }
 
@@ -210,7 +217,7 @@ export default function SignupPage() {
           </div>
           {imageBase64 && (
             <>
-              <img src={imageBase64} alt="Resized preview"/>
+              <img src={imageBase64} alt="Resized preview" />
               <button
                 onClick={() => setImageBase64("")}
                 className="p-3 text-red-600 bg-red-100 hover:bg-red-300 rounded-full transition"
@@ -232,6 +239,11 @@ export default function SignupPage() {
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200 bg-white"
             />
           </div>
+          {price && (
+            <div className="text-sm my-2 bg-blue-50">
+              Rp {new Intl.NumberFormat("id-ID").format(price)}
+            </div>
+          )}
           <div className="mb-4">
             <label className="block text-gray-500">Stock</label>
             <input
@@ -249,7 +261,10 @@ export default function SignupPage() {
             <label className="block text-gray-500">Select Category</label>
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => {
+                setCategory(e.target.value);
+                console.log(e.target.value)
+              }}
               required
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-200 bg-white"
             >
