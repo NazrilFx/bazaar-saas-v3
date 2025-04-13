@@ -27,7 +27,6 @@ import { StorePOSProductDetailModal } from "@/components/store/pos-product-detai
 import Link from "next/link";
 import Loading from "@/components/loading";
 import { loadSnapScript } from "@/utils/loadSnapScript";
-import mongoose from "mongoose";
 
 export interface IOrderItem {
     product_id: string;
@@ -147,9 +146,9 @@ export function StorePOSInterface() {
     if (loading) {
     return <Loading />;
   }
-  
+
   if (!loading && (!vendorEmail || !vendorPhone)) {
-    return <div>Vendor's email and phone not found</div>;
+    return <div>Vendor&apos;s email and phone not found</div>;
   }  
   const filteredProducts = products.filter(
     (product) =>
@@ -205,6 +204,24 @@ export function StorePOSInterface() {
     setIsProductDetailOpen(true);
   };
 
+  // function untuk seleksi beberapa transaction_status di midtrans menjadi data yang valid di database
+  function mapMidtransStatusToAppStatus(transaction_status: string): "pending" | "paid" | "canceled" {
+    switch (transaction_status) {
+      case "settlement":
+      case "capture":
+        return "paid";
+      case "pending":
+        return "pending";
+      case "cancel":
+      case "deny":
+      case "expire":
+      case "failure":
+        return "canceled";
+      default:
+        return "pending"; // fallback default
+    }
+  }
+
   const handleMidtransPay = async () => {
     if (!vendorEmail || typeof vendorPhone !== "string") {
       alert("email tidak ada");
@@ -240,9 +257,10 @@ export function StorePOSInterface() {
       });
 
       const data = await res.json();
-
+      
       if (!res.ok) {
         console.error('Telah terjadi error saat membuat order : ' + data)
+        return false
       }
 
       const createOrderRes = await fetch("/api/order/create", {
@@ -258,7 +276,7 @@ export function StorePOSInterface() {
           items: filteredOrderItems,
           total_amount: total,
           tax_amount: tax,
-          payment_method: "",
+          payment_method: "pending",
         }),
       });
 
@@ -268,26 +286,84 @@ export function StorePOSInterface() {
         console.error('Telah terjadi error saat membuat order : ' + dataOrder)
       )
 
-      console.log(dataOrder)
-
       if (data.token) {
         // Lanjutkan ke Snap Midtrans payment popup
         window.snap.pay(data.token, {
           onSuccess: async (result) => {
             setCart([]);
-            console.log("Pembayaran sukses", result);
+            const status = mapMidtransStatusToAppStatus(result.transaction_status)
+            const updateOrderRes = await fetch("/api/order/update-status", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                id: dataOrder.order._id.toString(),
+                status,
+                payment_method: result.payment_type,
+              })
+            })
+
+            const dataUpdateOrder = await updateOrderRes.json()
+
+            if (!updateOrderRes.ok) {
+              console.error("telah terjadi error saat mengupdate", dataUpdateOrder)
+              console.log(dataUpdateOrder)
+            } else {
+              console.log("update order berhasil", dataUpdateOrder)
+            }
           },
-          onPending: (result) => {
+          onPending: async (result) => {
             setCart([]);
-            console.log("Pembayaran pending", result);
+            const status = mapMidtransStatusToAppStatus(result.transaction_status)
+            const updateOrderRes = await fetch("/api/order/update-status", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                id: dataOrder.order._id.toString(),
+                status,
+                payment_method: result.payment_type,
+              })
+            })
+
+            const dataUpdateOrder = await updateOrderRes.json()
+
+            if (!updateOrderRes.ok) {
+              console.error("telah terjadi error saat mengupdate", dataUpdateOrder)
+              console.log(dataUpdateOrder)
+            } else {
+              console.log("update order berhasil", dataUpdateOrder)
+            }
           },
-          onError: (result) => {
+          onError: async (result) => {
             setCart([]);
-            console.log("Pembayaran gagal", result);
+            const status = mapMidtransStatusToAppStatus(result.transaction_status)
+            const updateOrderRes = await fetch("/api/order/update-status", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                id: dataOrder.order._id.toString(),
+                status,
+                payment_method: result.payment_type,
+              })
+            })
+
+            const dataUpdateOrder = await updateOrderRes.json()
+
+            if (!updateOrderRes.ok) {
+              console.error("telah terjadi error saat mengupdate", dataUpdateOrder)
+              console.log(dataUpdateOrder)
+            } else {
+              console.log("update order berhasil", dataUpdateOrder)
+            }
           },
-          onClose: () => {
+          onClose: async () => {
             setCart([]);
-            console.log("Popup ditutup");
+            alert("Halaman pembayaran ditutup, silahkan melakukan pembayaran")
           },
         });
       } else {

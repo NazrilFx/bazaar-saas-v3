@@ -19,7 +19,6 @@ export async function POST(req: NextRequest) {
 
         // Validasi item
         if (!items || !Array.isArray(items) || items.length === 0) {
-            console.log(items)
             return NextResponse.json({ message: "Order items are required." }, { status: 400 });
         }
         
@@ -31,8 +30,6 @@ export async function POST(req: NextRequest) {
             product_id: new mongoose.Types.ObjectId(product.id),
             subtotal: product.quantity * product.price
         }))
-
-        console.log(itemsWithSubtotal)
 
         const newOrder = new Order({
             customer_name,
