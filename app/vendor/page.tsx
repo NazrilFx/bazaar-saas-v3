@@ -196,7 +196,7 @@ export default function VendorDashboard() {
             </Button>
           </CardHeader>
           <CardContent>
-            <VendorStoresList stores={stores} />
+            <VendorStoresList status="active" stores={stores} />
           </CardContent>
           <CardFooter>
             <Button variant="outline" className="w-full">

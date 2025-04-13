@@ -1,11 +1,42 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { StoreOrdersList } from "@/components/store/orders-list"
 import { Download, Filter, Search } from "lucide-react"
+import { useState, useEffect } from "react"
+import Loading from "@/components/loading"
+import { IOrder } from "@/models/Order"
 
 export default function StoreOrdersPage() {
+  const [loading, setLoading] = useState(true)
+  const [orders, setOrders] = useState<IOrder[] | []>([])
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const res = await fetch("/api/order"); // Fetch dari API Next.js
+      const data = await res.json();
+
+      if (res.ok) {
+        setOrders(orders)
+      } else {
+        setOrders([])
+      }
+    };
+
+    fetchUser().then(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    console.log(orders)
+  }, [orders])
+
+  if (loading) {
+    return <Loading/>
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

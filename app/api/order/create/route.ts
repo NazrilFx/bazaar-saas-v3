@@ -14,8 +14,10 @@ export async function POST(req: NextRequest) {
             status,
             midtrans_token,
             payment_method,
+            store_id
         } = body;
 
+        const storeObjectId = new mongoose.Types.ObjectId(store_id);
 
         // Validasi item
         if (!items || !Array.isArray(items) || items.length === 0) {
@@ -32,6 +34,7 @@ export async function POST(req: NextRequest) {
         }))
 
         const newOrder = new Order({
+            store_id: storeObjectId,
             customer_name,
             customer_email,
             order_number: nextOrderNumber,

@@ -47,13 +47,13 @@ export default function VendorStoresPage() {
               <TabsTrigger value="inactive">Inactive</TabsTrigger>
             </TabsList>
             <TabsContent value="active">
-              <VendorStoresList status="active" />
+              <VendorStoresList status="active" stores={[]} />
             </TabsContent>
             <TabsContent value="pending">
-              <VendorStoresList status="pending" />
+              <VendorStoresList status="pending" stores={[]} />
             </TabsContent>
             <TabsContent value="inactive">
-              <VendorStoresList status="inactive" />
+              <VendorStoresList status="inactive" stores={[]} />
             </TabsContent>
           </Tabs>
         </CardContent>

@@ -29,10 +29,10 @@ import Loading from "@/components/loading";
 import { loadSnapScript } from "@/utils/loadSnapScript";
 
 export interface IOrderItem {
-    product_id: string;
-    name: string;
-    price: number;
-    quantity: number;
+  product_id: string;
+  name: string;
+  price: number;
+  quantity: number;
 }
 
 export interface IProduct {
@@ -109,10 +109,12 @@ export function StorePOSInterface() {
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
   const [isProductDetailOpen, setIsProductDetailOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showErrorVendorEmailAndPhone, setShowErrorVendorEmailAndPhone] = useState(true);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [vendorEmail, setVendorEmail] = useState<string | null>(null);
   const [vendorPhone, setVendorPhone] = useState<string | null>(null);
+  const [storeId, setStoreId] = useState("");
   // const [orderItems, setOrderItems] = useState<IOrderItem[] | []>([])
 
   useEffect(() => {
@@ -127,6 +129,7 @@ export function StorePOSInterface() {
           setCategories(["All", ...data.categories]);
           setVendorEmail(data.vendorEmail);
           setVendorPhone(data.vendorPhone);
+          setStoreId(data.storeId);
         } else {
           setProducts([]);
           setVendorEmail(null);
@@ -136,20 +139,29 @@ export function StorePOSInterface() {
         console.log(error);
       }
     };
-    fetchUser().then(() => setLoading(false));
-
+    
     loadSnapScript()
-      .then(() => setLoading(false))
-      .catch((err) => console.error(err));
+    .catch((err) => console.error(err));
+
+    fetchUser().then(() => {setLoading(false)});
   }, []);
 
-    if (loading) {
+  useEffect(() => {
+    if (!loading && (!vendorEmail || !vendorPhone)) {
+      setShowErrorVendorEmailAndPhone(true);
+    } else {
+      setShowErrorVendorEmailAndPhone(false);
+    }  
+  }, [vendorEmail, vendorPhone])
+
+  if (loading) {
     return <Loading />;
   }
 
-  if (!loading && (!vendorEmail || !vendorPhone)) {
+  if (showErrorVendorEmailAndPhone) {
     return <div>Vendor&apos;s email and phone not found</div>;
-  }  
+  }
+
   const filteredProducts = products.filter(
     (product) =>
       (activeCategory === "All" || product.category === activeCategory) &&
@@ -205,7 +217,9 @@ export function StorePOSInterface() {
   };
 
   // function untuk seleksi beberapa transaction_status di midtrans menjadi data yang valid di database
-  function mapMidtransStatusToAppStatus(transaction_status: string): "pending" | "paid" | "canceled" {
+  function mapMidtransStatusToAppStatus(
+    transaction_status: string
+  ): "pending" | "paid" | "canceled" {
     switch (transaction_status) {
       case "settlement":
       case "capture":
@@ -232,45 +246,24 @@ export function StorePOSInterface() {
     }
 
     const filteredOrderItems: IOrderItem[] = cart
-  .filter((item) => item.quantity > 0) // ← filter item yang quantity > 0
-  .map((item) => ({
-    product_id: item.id.toString(),
-    name: item.name,
-    quantity: item.quantity,
-    price: item.price,
-  }));
+      .filter((item) => item.quantity > 0) // ← filter item yang quantity > 0
+      .map((item) => ({
+        product_id: item.id.toString(),
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+      }));
 
     try {
-      const res = await fetch("/api/midtrans/transaction", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: { storeName }, // name bisa diinput dari user
-          email: vendorEmail, // email user
-          phone: vendorPhone, // nomor HP user
-          tax: tax,
-          amount: total, // total pembayaran
-          items: filteredOrderItems,
-        }),
-      });
-
-      const data = await res.json();
-      
-      if (!res.ok) {
-        console.error('Telah terjadi error saat membuat order : ' + data)
-        return false
-      }
-
       const createOrderRes = await fetch("/api/order/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          store_id: storeId,
           customer_name: storeName,
-          midtrans_token: data.token,
+          midtrans_token: "pending",
           customer_email: vendorEmail,
           status: "pending",
           items: filteredOrderItems,
@@ -280,18 +273,63 @@ export function StorePOSInterface() {
         }),
       });
 
-      const dataOrder = await createOrderRes.json()
+      const dataOrder = await createOrderRes.json();
 
-      if (!createOrderRes.ok) (
-        console.error('Telah terjadi error saat membuat order : ' + dataOrder)
-      )
+      if (!createOrderRes.ok) {
+        console.error("Gagal membuat order : " + dataOrder);
+        return false;
+      }
+
+      const res = await fetch("/api/midtrans/transaction", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: { storeName }, // name bisa diinput dari user
+          orderNumber: dataOrder.order.order_number,
+          email: vendorEmail, // email user
+          phone: vendorPhone, // nomor HP user
+          tax: tax,
+          amount: total, // total pembayaran
+          items: filteredOrderItems,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("Telah terjadi error saat membuat transaksi : " + data);
+        console.log(data);
+        return false;
+      }
+ 
+      const updateTokenRes = await fetch("/api/order/update-token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: dataOrder.order._id.toString(),
+          midtrans_token: data.token,
+        }),
+      });
+
+      const dataUpdateToken = await updateTokenRes.json();
+
+      if (!updateTokenRes.ok) {
+        console.error("gagal mengupdate token di order : ", updateTokenRes);
+        console.log(dataUpdateToken);
+      }
 
       if (data.token) {
         // Lanjutkan ke Snap Midtrans payment popup
         window.snap.pay(data.token, {
           onSuccess: async (result) => {
             setCart([]);
-            const status = mapMidtransStatusToAppStatus(result.transaction_status)
+            const status = mapMidtransStatusToAppStatus(
+              result.transaction_status
+            );
             const updateOrderRes = await fetch("/api/order/update-status", {
               method: "POST",
               headers: {
@@ -301,21 +339,26 @@ export function StorePOSInterface() {
                 id: dataOrder.order._id.toString(),
                 status,
                 payment_method: result.payment_type,
-              })
-            })
+              }),
+            });
 
-            const dataUpdateOrder = await updateOrderRes.json()
+            const dataUpdateOrder = await updateOrderRes.json();
 
             if (!updateOrderRes.ok) {
-              console.error("telah terjadi error saat mengupdate", dataUpdateOrder)
-              console.log(dataUpdateOrder)
+              console.error(
+                "telah terjadi error saat mengupdate",
+                dataUpdateOrder
+              );
+              console.log(dataUpdateOrder);
             } else {
-              console.log("update order berhasil", dataUpdateOrder)
+              console.log("update order berhasil", dataUpdateOrder);
             }
           },
           onPending: async (result) => {
             setCart([]);
-            const status = mapMidtransStatusToAppStatus(result.transaction_status)
+            const status = mapMidtransStatusToAppStatus(
+              result.transaction_status
+            );
             const updateOrderRes = await fetch("/api/order/update-status", {
               method: "POST",
               headers: {
@@ -325,21 +368,26 @@ export function StorePOSInterface() {
                 id: dataOrder.order._id.toString(),
                 status,
                 payment_method: result.payment_type,
-              })
-            })
+              }),
+            });
 
-            const dataUpdateOrder = await updateOrderRes.json()
+            const dataUpdateOrder = await updateOrderRes.json();
 
             if (!updateOrderRes.ok) {
-              console.error("telah terjadi error saat mengupdate", dataUpdateOrder)
-              console.log(dataUpdateOrder)
+              console.error(
+                "telah terjadi error saat mengupdate",
+                dataUpdateOrder
+              );
+              console.log(dataUpdateOrder);
             } else {
-              console.log("update order berhasil", dataUpdateOrder)
+              console.log("update order berhasil", dataUpdateOrder);
             }
           },
           onError: async (result) => {
             setCart([]);
-            const status = mapMidtransStatusToAppStatus(result.transaction_status)
+            const status = mapMidtransStatusToAppStatus(
+              result.transaction_status
+            );
             const updateOrderRes = await fetch("/api/order/update-status", {
               method: "POST",
               headers: {
@@ -349,21 +397,24 @@ export function StorePOSInterface() {
                 id: dataOrder.order._id.toString(),
                 status,
                 payment_method: result.payment_type,
-              })
-            })
+              }),
+            });
 
-            const dataUpdateOrder = await updateOrderRes.json()
+            const dataUpdateOrder = await updateOrderRes.json();
 
             if (!updateOrderRes.ok) {
-              console.error("telah terjadi error saat mengupdate", dataUpdateOrder)
-              console.log(dataUpdateOrder)
+              console.error(
+                "telah terjadi error saat mengupdate",
+                dataUpdateOrder
+              );
+              console.log(dataUpdateOrder);
             } else {
-              console.log("update order berhasil", dataUpdateOrder)
+              console.log("update order berhasil", dataUpdateOrder);
             }
           },
           onClose: async () => {
             setCart([]);
-            alert("Halaman pembayaran ditutup, silahkan melakukan pembayaran")
+            alert("Halaman pembayaran ditutup, silahkan melakukan pembayaran");
           },
         });
       } else {
@@ -432,7 +483,7 @@ export function StorePOSInterface() {
             />
           ))}
 
-          {filteredProducts.length === 0 && (
+          {!loading && filteredProducts.length === 0 && (
             <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
               <ShoppingCart className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium">No Products Found</h3>
@@ -483,7 +534,11 @@ export function StorePOSInterface() {
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium truncate">{item.name}</h3>
                       <p className="text-sm text-muted-foreground">
-                        ${item.price.toFixed(2)}
+                        {item.price.toLocaleString("id-ID", {
+                          style: "currency",
+                          currency: "IDR",
+                          minimumFractionDigits: 0,
+                        })}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 ml-4">
@@ -526,15 +581,33 @@ export function StorePOSInterface() {
             <div className="w-full space-y-2">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>
+                  {subtotal.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    minimumFractionDigits: 0,
+                  })}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Tax (10%)</span>
-                <span>${tax.toFixed(2)}</span>
+                <span>
+                  {tax.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    minimumFractionDigits: 0,
+                  })}
+                </span>
               </div>
               <div className="flex justify-between font-medium text-lg pt-2">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>
+                  {total.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    minimumFractionDigits: 0,
+                  })}
+                </span>
               </div>
               <Button
                 className="w-full mt-4 bg-store-primary hover:bg-store-secondary text-white"

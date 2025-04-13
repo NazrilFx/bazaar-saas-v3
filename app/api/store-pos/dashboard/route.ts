@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
     }));
 
     return new Response(
-      JSON.stringify({ categories: categoryNames, products, storeName: store.name, vendorEmail: vendor.email, vendorPhone: vendor.phone }, null, 2),
+      JSON.stringify({ categories: categoryNames, products, storeName: store.name, vendorEmail: vendor.email, vendorPhone: vendor.phone, storeId: store._id }, null, 2),
       {
         status: 200,
         headers: { "Content-Type": "application/json" },

@@ -1,4 +1,4 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IOrderItem {
     product_id: mongoose.Types.ObjectId;
@@ -9,6 +9,7 @@ export interface IOrderItem {
 }
 
 export interface IOrder extends Document {
+    store_id: mongoose.Types.ObjectId; // Referensi ke store
     midtrans_token: string
     customer_name: string;
     customer_email: string;
@@ -35,6 +36,7 @@ const orderItemSchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
     {
+        store_id: { type: Schema.Types.ObjectId, ref: "Store", required: true }, // Relasi ke vendor
         midtrans_token: { type: String, required: true },
         customer_name: { type: String, required: true },
         customer_email: { type: String, required: true },

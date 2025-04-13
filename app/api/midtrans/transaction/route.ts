@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import midtransClient from "midtrans-client";
-import Order from "@/models/Order";
 
 // Snap API Midtrans instance
 const snap = new midtransClient.Snap({
@@ -12,12 +11,14 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     // Hitung order_number otomatis
-    const lastOrder = await Order.findOne().sort({ order_number: -1 });
-    const nextOrderNumber = lastOrder ? lastOrder.order_number + 1 : 1;
 
+    if (!body.orderNumber) {
+      return NextResponse.json({ error: "Butuh order id" }, { status: 404 });
+    }
+    
     const parameter = {
       transaction_details: {
-        order_id: nextOrderNumber,
+        order_id: body.orderNumber,
         gross_amount: body.amount, // total semua item
       },
       item_details: [

@@ -58,10 +58,11 @@ import { StoresWithBazarEvent } from "@/app/vendor/page";
 // }
 
 interface VendorStoresListProps {
+  status: "active" | "inactive" | "pending"
   stores: StoresWithBazarEvent[];
 }
 
-export function VendorStoresList({ stores }: VendorStoresListProps) {
+export function VendorStoresList({ status, stores }: VendorStoresListProps) {
   if (stores.length === 0) {
     return (
       <Card className="flex flex-col items-center justify-center p-8 text-center">
