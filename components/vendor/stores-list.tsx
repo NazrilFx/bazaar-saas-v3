@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { StoresWithBazarEvent } from "@/app/vendor/page";
+import { useRouter } from "next/navigation";
 
 // const stores: Record<string, VendorStore[]> = {
 //   active: [
@@ -58,12 +59,25 @@ import { StoresWithBazarEvent } from "@/app/vendor/page";
 // }
 
 interface VendorStoresListProps {
-  status: "active" | "inactive" | "pending"
-  stores: StoresWithBazarEvent[];
+  status: "active" | "inactive" | "pending";
+  stores: StoresWithBazarEvent[] | [];
+  deactive: (storeId: string) => void,
+  activate: (storeId: string) => void,
 }
 
-export function VendorStoresList({ status, stores }: VendorStoresListProps) {
-  if (stores.length === 0) {
+export function VendorStoresList({ status, stores, deactive, activate }: VendorStoresListProps) {
+  const router = useRouter()
+  let storesList: StoresWithBazarEvent[] = [];
+
+  if (status === "active") {
+    storesList = stores.filter((store) => store.active === true);
+  } else if (status === "inactive") {
+    storesList = stores.filter((store) => store.active === false);
+  } else if (status === "pending") {
+    storesList = []; // Fitur store pending dihilangkan
+  }
+
+  if (storesList.length === 0) {
     return (
       <Card className="flex flex-col items-center justify-center p-8 text-center">
         <Store className="h-12 w-12 text-muted-foreground mb-4" />
@@ -75,14 +89,14 @@ export function VendorStoresList({ status, stores }: VendorStoresListProps) {
             ? "You don't have any inactive stores at the moment."
             : "You don't have any active stores at the moment."}
         </p>
-        <Button className="mt-4">Register New Store</Button>
+        <Button onClick={() => router.push("/signup-store")} className="mt-4">Register New Store</Button>
       </Card>
     );
   }
 
   return (
     <div className="space-y-4">
-      {stores.map((store) => (
+      {storesList.map((store) => (
         <div
           key={store._id.toString()}
           className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border rounded-lg bg-white"
@@ -118,7 +132,12 @@ export function VendorStoresList({ status, stores }: VendorStoresListProps) {
           <div className="flex items-center gap-2 self-end sm:self-auto">
             <div className="text-right mr-2">
               <div className="font-medium">
-                ${store.revenue.toLocaleString()}
+                {store.revenue.toLocaleString("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })}
               </div>
               <div className="text-xs text-muted-foreground">Total Revenue</div>
             </div>
@@ -141,11 +160,11 @@ export function VendorStoresList({ status, stores }: VendorStoresListProps) {
                 </>
                 <DropdownMenuSeparator />
                 {store.active ? (
-                  <DropdownMenuItem className="text-red-600">
+                  <DropdownMenuItem className="text-red-600" onClick={() => deactive(store._id.toString())}>
                     Deactivate Store
                   </DropdownMenuItem>
                 ) : (
-                  <DropdownMenuItem className="text-green-600">
+                  <DropdownMenuItem className="text-green-600" onClick={() => activate(store._id.toString())}>
                     Activate Store
                   </DropdownMenuItem>
                 )}

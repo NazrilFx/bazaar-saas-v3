@@ -109,7 +109,8 @@ export function StorePOSInterface() {
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
   const [isProductDetailOpen, setIsProductDetailOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showErrorVendorEmailAndPhone, setShowErrorVendorEmailAndPhone] = useState(true);
+  const [showErrorVendorEmailAndPhone, setShowErrorVendorEmailAndPhone] =
+    useState(true);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [vendorEmail, setVendorEmail] = useState<string | null>(null);
@@ -139,11 +140,12 @@ export function StorePOSInterface() {
         console.log(error);
       }
     };
-    
-    loadSnapScript()
-    .catch((err) => console.error(err));
 
-    fetchUser().then(() => {setLoading(false)});
+    loadSnapScript().catch((err) => console.error(err));
+
+    fetchUser().then(() => {
+      setLoading(false);
+    });
   }, []);
 
   useEffect(() => {
@@ -151,8 +153,8 @@ export function StorePOSInterface() {
       setShowErrorVendorEmailAndPhone(true);
     } else {
       setShowErrorVendorEmailAndPhone(false);
-    }  
-  }, [vendorEmail, vendorPhone])
+    }
+  }, [vendorEmail, vendorPhone]);
 
   if (loading) {
     return <Loading />;
@@ -208,7 +210,7 @@ export function StorePOSInterface() {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-  const tax = subtotal * 0.1; // 10% tax
+  const tax = Math.floor(subtotal * 0.1); // tax 10% dibulatkan kebawah
   const total = subtotal + tax;
 
   const handleViewProductDetails = (product: IProduct) => {
@@ -296,14 +298,13 @@ export function StorePOSInterface() {
         }),
       });
 
+      if (!res.ok) {
+        const text = await res.text(); // Coba baca text biar tahu isi response-nya
+        throw new Error(`Fetch failed: ${res.status} - ${text}`);
+      }
+
       const data = await res.json();
 
-      if (!res.ok) {
-        console.error("Telah terjadi error saat membuat transaksi : " + data);
-        console.log(data);
-        return false;
-      }
- 
       const updateTokenRes = await fetch("/api/order/update-token", {
         method: "POST",
         headers: {
@@ -423,6 +424,7 @@ export function StorePOSInterface() {
       }
     } catch (error) {
       console.error("Checkout error:", error);
+      console.log(error);
     }
   };
 
