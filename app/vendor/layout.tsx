@@ -1,6 +1,8 @@
 "use client";
 
 import type React from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 import { DashboardLayout } from "@/components/dashboard-layout";
 import {
@@ -13,6 +15,7 @@ import {
   Store,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import Loading from "@/components/loading";
 
 const navItems = [
   {
@@ -71,6 +74,7 @@ export default function VendorLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const router = useRouter()
   const [vendor, setVendor] = useState<Ivendor | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -96,8 +100,35 @@ export default function VendorLayout({
     fetchUser();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  const handleLogout = async () => {
+    // Hapus cookies terkait login
+   await fetch("/api/auth-vendor/logout")
+    router.push('/login-store')
+  }
+
+  if (loading) return <Loading/>;
   if (!vendor) return <p>vendor not found</p>;
+  if (!vendor.verified) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md">
+          <h1 className="text-2xl font-semibold text-red-600 mb-4">
+            Vendor Telah Dinonaktifkan
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Maaf, akun vendor Anda saat ini sedang tidak aktif. Silakan hubungi admin
+            untuk informasi lebih lanjut.
+          </p>
+          <Button
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-700 text-white w-full"
+          >
+            Logout
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <DashboardLayout

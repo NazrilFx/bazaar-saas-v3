@@ -60,7 +60,7 @@ export default function SignupPage() {
       console.error("Signup error:", error);
     } finally {
       setLoading(false);
-      router.push("/login")
+      router.push("/login-admin")
     }
   };
 

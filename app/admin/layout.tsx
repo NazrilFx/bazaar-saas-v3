@@ -13,6 +13,7 @@ import {
   Store,
   Users,
 } from "lucide-react";
+import Loading from "@/components/loading";
 
 const navItems = [
   {
@@ -89,7 +90,7 @@ export default function AdminLayout({
     fetchUser();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Loading/>
   if (!admin)
     return (
       <p>

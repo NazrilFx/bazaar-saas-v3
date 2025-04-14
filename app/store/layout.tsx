@@ -16,6 +16,8 @@ import {
 import { useState, useEffect } from "react";
 import { IStore } from "@/models/Store";
 import Loading from "@/components/loading";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
   {
@@ -70,9 +72,10 @@ export default function StoreLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [vendorName, setVendorName] = useState("")
+  const [vendorName, setVendorName] = useState("");
   const [store, setStore] = useState<IStore | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -82,7 +85,7 @@ export default function StoreLayout({
 
         if (res.ok) {
           setStore(data.store);
-          setVendorName(data.vendor_name)
+          setVendorName(data.vendor_name);
         } else {
           setStore(null);
         }
@@ -97,8 +100,35 @@ export default function StoreLayout({
     fetchUser();
   }, []);
 
-  if (loading) return <Loading/>;
+  const handleLogout = async () => {
+    // Hapus cookies terkait login
+    await fetch("/api/auth-store/logout");
+    router.push("/login-store");
+  };
+
+  if (loading) return <Loading />;
   if (!store) return <p>store not found</p>;
+  if (!store.active) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md">
+          <h1 className="text-2xl font-semibold text-red-600 mb-4">
+            Store Telah Dinonaktifkan
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Maaf, toko Anda saat ini sedang tidak aktif. Silakan hubungi admin
+            untuk informasi lebih lanjut.
+          </p>
+          <Button
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-700 text-white w-full"
+          >
+            Logout
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <DashboardLayout

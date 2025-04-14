@@ -27,18 +27,19 @@ import { useState, useEffect } from "react";
 import { IStore } from "@/models/Store";
 import { IEvent } from "@/models/Event";
 import { ObjectId } from "mongodb";
+import Loading from "@/components/loading";
 
 export type StoresWithBazarEvent = IStore & {
-  _id: ObjectId
-  bazarEvent: string,
-  revenue: number,
-  productCount: number
+  _id: ObjectId;
+  bazarEvent: string;
+  revenue: number;
+  productCount: number;
 };
 
 export type EventWithStoreThisEvent = IEvent & {
-  _id: ObjectId
-  storeThisEvent: number,
-  isActive: boolean,
+  _id: ObjectId;
+  storeThisEvent: number;
+  isActive: boolean;
 };
 
 export default function VendorDashboard() {
@@ -49,7 +50,11 @@ export default function VendorDashboard() {
   const [isProductsGrowth, setIsProductsGrowth] = useState(false);
   const [totalProductsLastMonth, setTotalProductsLastMonth] = useState(0);
   const [participatingStoresCount, setParticipatingStoresCount] = useState(0);
-  const [upcomingEvents, setUpcomingEvents] = useState<EventWithStoreThisEvent[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<
+    EventWithStoreThisEvent[]
+  >([]);
+  const [loading, setLoading] = useState(true)
+  const [csrfToken, setCsrfToken] = useState("");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -67,7 +72,11 @@ export default function VendorDashboard() {
       }
     };
 
-    fetchUser();
+    fetch("/api/csrf")
+      .then((res) => res.json())
+      .then((data) => setCsrfToken(data.csrfToken));
+
+    fetchUser().then(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -81,6 +90,52 @@ export default function VendorDashboard() {
     setIsProductsGrowth(growth >= 0);
     console.log(totalProductsLastMonth);
   }, [totalProducts, totalProductsLastMonth]);
+
+  if (loading) {
+    return <Loading/>
+  }
+
+  const deactive = async (storeId: string) => {
+    const res = await fetch("/api/vendor/stores/deactive", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        // kirim data yang dibutuhkan untuk mengaktifkan vendor
+        storeId,
+        csrfToken,
+      }),
+    });
+
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("Server returned an invalid response");
+    }
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Activate failed");
+    window.location.reload();
+  };
+
+  const activate = async (storeId: string) => {
+    const res = await fetch("/api/vendor/stores/activate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        // kirim data yang dibutuhkan untuk mengaktifkan vendor
+        storeId,
+        csrfToken,
+      }),
+    });
+
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("Server returned an invalid response");
+    }
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Activate failed");
+    window.location.reload();
+  };
 
   return (
     <div className="space-y-6">
@@ -188,15 +243,24 @@ export default function VendorDashboard() {
                 Manage your store locations across different bazaars
               </CardDescription>
             </div>
-            <Button onClick={() => {
-              router.push("/signup-store");
-            }} variant="outline" size="sm">
+            <Button
+              onClick={() => {
+                router.push("/signup-store");
+              }}
+              variant="outline"
+              size="sm"
+            >
               <Plus className="mr-2 h-4 w-4" />
               Add Store
             </Button>
           </CardHeader>
           <CardContent>
-            <VendorStoresList status="active" stores={stores} />
+            <VendorStoresList
+              status="active"
+              stores={stores}
+              deactive={deactive}
+              activate={activate}
+            />
           </CardContent>
           <CardFooter>
             <Button variant="outline" className="w-full">
