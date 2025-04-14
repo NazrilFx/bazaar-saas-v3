@@ -116,7 +116,8 @@ export default function StoreProductsPage() {
       }
       console.error("Update error :", error);
     } finally {
-      setTargetProductId("")
+      setTargetProductId("");
+      window.location.reload();
     }
   };
 
@@ -154,7 +155,7 @@ export default function StoreProductsPage() {
       }
 
       if (!res.ok) throw new Error(data.message || "Create failed");
-      console.log(data)
+      console.log(data);
     } catch (error: unknown) {
       let errorMessage = "Internal Server Error";
 
@@ -163,8 +164,8 @@ export default function StoreProductsPage() {
       }
       console.error("Update error :", error);
     } finally {
-      setTargetProductId("")
-      window.location.reload()
+      setTargetProductId("");
+      window.location.reload();
     }
   };
 

@@ -92,12 +92,10 @@ export default function StoreLayout({
       } catch (error) {
         console.error("Error fetching user:", error);
         setStore(null);
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchUser();
+    fetchUser().then(() => setLoading(false));
   }, []);
 
   const handleLogout = async () => {

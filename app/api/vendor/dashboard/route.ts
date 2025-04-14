@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
         if (!decoded || typeof decoded === "string" || !decoded.id) {
             return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-        }
+        } 
 
         const vendorId = decoded.id;
 

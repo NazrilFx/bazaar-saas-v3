@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface IProduct {
+export interface IProduct {
   _id: string;
   name: string;
   category: string;
