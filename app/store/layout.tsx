@@ -89,6 +89,7 @@ export default function StoreLayout({
         } else {
           setStore(null);
         }
+
       } catch (error) {
         console.error("Error fetching user:", error);
         setStore(null);

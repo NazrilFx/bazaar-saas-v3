@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/dbConnect";
 import Category from "@/models/Category";
+import Product from "@/models/Product";
 
 export async function POST(req: Request) {
   try {
@@ -16,7 +17,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Category not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Category deleted successfully" });
+    await Product.deleteMany({ category_id: id });
+
+    return NextResponse.json({ message: "Category and related products deleted successfully" });
   } catch (error: unknown) {
     return NextResponse.json(
       { message: "Internal Server Error", error: error instanceof Error ? error.message : "Unknown error" },

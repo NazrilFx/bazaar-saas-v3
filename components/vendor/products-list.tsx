@@ -1,3 +1,5 @@
+"use client"
+
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -12,164 +14,180 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 
-interface Product {
+export interface Product {
   id: string
   name: string
   category: string
   price: number
   stock: number
   store: string
-  status: "active" | "out_of_stock" | "pending"
+  status: "in_stock" | "out_of_stock" | "low_stock"
   image?: string
 }
 
-const products: Record<string, Product[]> = {
-  all: [
-    {
-      id: "p1",
-      name: "Organic Salad Bowl",
-      category: "Food",
-      price: 12.99,
-      stock: 45,
-      store: "Organic Delights",
-      status: "active",
-      image: "/placeholder.svg?height=40&width=40&text=Salad",
-    },
-    {
-      id: "p2",
-      name: "Fresh Fruit Smoothie",
-      category: "Beverages",
-      price: 8.5,
-      stock: 32,
-      store: "Organic Delights",
-      status: "active",
-      image: "/placeholder.svg?height=40&width=40&text=Smoothie",
-    },
-    {
-      id: "p3",
-      name: "Vegan Protein Bar",
-      category: "Snacks",
-      price: 4.99,
-      stock: 0,
-      store: "Organic Delights",
-      status: "out_of_stock",
-      image: "/placeholder.svg?height=40&width=40&text=Bar",
-    },
-    {
-      id: "p4",
-      name: "Handmade Ceramic Mug",
-      category: "Crafts",
-      price: 18.99,
-      stock: 15,
-      store: "Handcrafted Treasures",
-      status: "active",
-      image: "/placeholder.svg?height=40&width=40&text=Mug",
-    },
-    {
-      id: "p5",
-      name: "Artisan Soap Set",
-      category: "Bath & Body",
-      price: 24.5,
-      stock: 8,
-      store: "Handcrafted Treasures",
-      status: "active",
-      image: "/placeholder.svg?height=40&width=40&text=Soap",
-    },
-    {
-      id: "p6",
-      name: "Eco-Friendly Tote Bag",
-      category: "Accessories",
-      price: 15.0,
-      store: "Handcrafted Treasures",
-      stock: 0,
-      status: "pending",
-      image: "/placeholder.svg?height=40&width=40&text=Bag",
-    },
-  ],
-  active: [
-    {
-      id: "p1",
-      name: "Organic Salad Bowl",
-      category: "Food",
-      price: 12.99,
-      stock: 45,
-      store: "Organic Delights",
-      status: "active",
-      image: "/placeholder.svg?height=40&width=40&text=Salad",
-    },
-    {
-      id: "p2",
-      name: "Fresh Fruit Smoothie",
-      category: "Beverages",
-      price: 8.5,
-      stock: 32,
-      store: "Organic Delights",
-      status: "active",
-      image: "/placeholder.svg?height=40&width=40&text=Smoothie",
-    },
-    {
-      id: "p4",
-      name: "Handmade Ceramic Mug",
-      category: "Crafts",
-      price: 18.99,
-      stock: 15,
-      store: "Handcrafted Treasures",
-      status: "active",
-      image: "/placeholder.svg?height=40&width=40&text=Mug",
-    },
-    {
-      id: "p5",
-      name: "Artisan Soap Set",
-      category: "Bath & Body",
-      price: 24.5,
-      stock: 8,
-      store: "Handcrafted Treasures",
-      status: "active",
-      image: "/placeholder.svg?height=40&width=40&text=Soap",
-    },
-  ],
-  out_of_stock: [
-    {
-      id: "p3",
-      name: "Vegan Protein Bar",
-      category: "Snacks",
-      price: 4.99,
-      stock: 0,
-      store: "Organic Delights",
-      status: "out_of_stock",
-      image: "/placeholder.svg?height=40&width=40&text=Bar",
-    },
-  ],
-  pending: [
-    {
-      id: "p6",
-      name: "Eco-Friendly Tote Bag",
-      category: "Accessories",
-      price: 15.0,
-      store: "Handcrafted Treasures",
-      stock: 0,
-      status: "pending",
-      image: "/placeholder.svg?height=40&width=40&text=Bag",
-    },
-  ],
-}
+// const products: Record<string, Product[]> = {
+//   all: [
+//     {
+//       id: "p1",
+//       name: "Organic Salad Bowl",
+//       category: "Food",
+//       price: 12.99,
+//       stock: 45,
+//       store: "Organic Delights",
+//       status: "active",
+//       image: "/placeholder.svg?height=40&width=40&text=Salad",
+//     },
+//     {
+//       id: "p2",
+//       name: "Fresh Fruit Smoothie",
+//       category: "Beverages",
+//       price: 8.5,
+//       stock: 32,
+//       store: "Organic Delights",
+//       status: "active",
+//       image: "/placeholder.svg?height=40&width=40&text=Smoothie",
+//     },
+//     {
+//       id: "p3",
+//       name: "Vegan Protein Bar",
+//       category: "Snacks",
+//       price: 4.99,
+//       stock: 0,
+//       store: "Organic Delights",
+//       status: "out_of_stock",
+//       image: "/placeholder.svg?height=40&width=40&text=Bar",
+//     },
+//     {
+//       id: "p4",
+//       name: "Handmade Ceramic Mug",
+//       category: "Crafts",
+//       price: 18.99,
+//       stock: 15,
+//       store: "Handcrafted Treasures",
+//       status: "active",
+//       image: "/placeholder.svg?height=40&width=40&text=Mug",
+//     },
+//     {
+//       id: "p5",
+//       name: "Artisan Soap Set",
+//       category: "Bath & Body",
+//       price: 24.5,
+//       stock: 8,
+//       store: "Handcrafted Treasures",
+//       status: "active",
+//       image: "/placeholder.svg?height=40&width=40&text=Soap",
+//     },
+//     {
+//       id: "p6",
+//       name: "Eco-Friendly Tote Bag",
+//       category: "Accessories",
+//       price: 15.0,
+//       store: "Handcrafted Treasures",
+//       stock: 0,
+//       status: "low_stock",
+//       image: "/placeholder.svg?height=40&width=40&text=Bag",
+//     },
+//   ],
+//   active: [
+//     {
+//       id: "p1",
+//       name: "Organic Salad Bowl",
+//       category: "Food",
+//       price: 12.99,
+//       stock: 45,
+//       store: "Organic Delights",
+//       status: "active",
+//       image: "/placeholder.svg?height=40&width=40&text=Salad",
+//     },
+//     {
+//       id: "p2",
+//       name: "Fresh Fruit Smoothie",
+//       category: "Beverages",
+//       price: 8.5,
+//       stock: 32,
+//       store: "Organic Delights",
+//       status: "active",
+//       image: "/placeholder.svg?height=40&width=40&text=Smoothie",
+//     },
+//     {
+//       id: "p4",
+//       name: "Handmade Ceramic Mug",
+//       category: "Crafts",
+//       price: 18.99,
+//       stock: 15,
+//       store: "Handcrafted Treasures",
+//       status: "active",
+//       image: "/placeholder.svg?height=40&width=40&text=Mug",
+//     },
+//     {
+//       id: "p5",
+//       name: "Artisan Soap Set",
+//       category: "Bath & Body",
+//       price: 24.5,
+//       stock: 8,
+//       store: "Handcrafted Treasures",
+//       status: "active",
+//       image: "/placeholder.svg?height=40&width=40&text=Soap",
+//     },
+//   ],
+//   out_of_stock: [
+//     {
+//       id: "p3",
+//       name: "Vegan Protein Bar",
+//       category: "Snacks",
+//       price: 4.99,
+//       stock: 0,
+//       store: "Organic Delights",
+//       status: "out_of_stock",
+//       image: "/placeholder.svg?height=40&width=40&text=Bar",
+//     },
+//   ],
+//   low_stock: [
+//     {
+//       id: "p6",
+//       name: "Eco-Friendly Tote Bag",
+//       category: "Accessories",
+//       price: 15.0,
+//       store: "Handcrafted Treasures",
+//       stock: 0,
+//       status: "low_stock",
+//       image: "/placeholder.svg?height=40&width=40&text=Bag",
+//     },
+//   ],
+// }
 
 interface VendorProductsListProps {
-  status: "all" | "active" | "out_of_stock" | "pending"
+  status: "all" | "in_stock" | "out_of_stock" | "low_stock"
+  products: Product[]
+  updateStock: (id: string, stock: number) => void;
+  deleteProduct: (id: string) => void;
 }
 
-export function VendorProductsList({ status }: VendorProductsListProps) {
-  const productsList = products[status] || []
+export function VendorProductsList({ status, products, updateStock, deleteProduct }: VendorProductsListProps) {
+  const router = useRouter()
+    let productsList: Product[] = [];
+  
+    if (status === "in_stock") {
+      productsList = products.filter((product) => product.status === "in_stock");
+    } else if (status === "out_of_stock") {
+      productsList = products.filter((product) => product.status === "out_of_stock");
+    } else if (status === "low_stock") {
+      productsList = products.filter((product) => product.status === "low_stock");// Fitur product low_stock dihilangkan
+    } else if (status === "all") {
+      productsList = products
+    }
+  
 
   if (productsList.length === 0) {
     return (
       <Card className="flex flex-col items-center justify-center p-8 text-center">
         <ShoppingBag className="h-12 w-12 text-muted-foreground mb-4" />
         <h3 className="text-lg font-medium">No products found</h3>
-        <p className="text-sm text-muted-foreground max-w-md mt-1">
-          {status === "pending"
-            ? "You don't have any products pending approval at the moment."
+        <p className="text-sm text-muted-foreground max-w-md mt-1"> 
+          {status === "low_stock"
+            ? "You don't have any products low_stock approval at the moment."
             : status === "out_of_stock"
               ? "You don't have any out of stock products at the moment."
               : "You don't have any products at the moment."}
@@ -218,24 +236,24 @@ export function VendorProductsList({ status }: VendorProductsListProps) {
             </TableCell>
             <TableCell>{product.category}</TableCell>
             <TableCell>${product.price.toFixed(2)}</TableCell>
-            <TableCell>{product.status === "pending" ? "N/A" : product.stock}</TableCell>
+            <TableCell>{product.status === "low_stock" ? "N/A" : product.stock}</TableCell>
             <TableCell>{product.store}</TableCell>
             <TableCell>
               <Badge
                 variant="outline"
                 className={
-                  product.status === "active"
+                  product.status === "in_stock"
                     ? "bg-green-50 text-green-700 border-green-200"
                     : product.status === "out_of_stock"
                       ? "bg-red-50 text-red-700 border-red-200"
                       : "bg-amber-50 text-amber-700 border-amber-200"
                 }
               >
-                {product.status === "active"
-                  ? "Active"
+                {product.status === "in_stock"
+                  ? "in_stock"
                   : product.status === "out_of_stock"
                     ? "Out of Stock"
-                    : "Pending Approval"}
+                    : "low_stock"}
               </Badge>
             </TableCell>
             <TableCell className="text-right">
@@ -253,10 +271,10 @@ export function VendorProductsList({ status }: VendorProductsListProps) {
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>View Details</DropdownMenuItem>
-                    {product.status !== "pending" && <DropdownMenuItem>Update Stock</DropdownMenuItem>}
-                    <DropdownMenuItem>Edit Product</DropdownMenuItem>
+                    {product.status !== "low_stock" && <DropdownMenuItem onClick={() => updateStock(product.id, product.price)}>Update Stock</DropdownMenuItem>}
+                    <DropdownMenuItem onClick={() => router.push(`/store/product/edit/${product.id}`)}>Edit Product</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-red-600">Remove Product</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => deleteProduct(product.id)} className="text-red-600">Remove Product</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

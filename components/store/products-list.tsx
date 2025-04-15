@@ -35,6 +35,7 @@ interface StoreProductsListProps {
   edit: (id: string) => void;
   updateStock: (id: string, stock: number) => void;
   editPrice: (id: string, price: number) => void;
+  deleteProduct: (id: string) => void;
 }
 
 export function StoreProductsList({
@@ -43,6 +44,7 @@ export function StoreProductsList({
   edit,
   updateStock,
   editPrice,
+  deleteProduct,
 }: StoreProductsListProps) {
   const productsList =
     status === "all"
@@ -160,7 +162,7 @@ export function StoreProductsList({
                         Update Price
                       </DropdownMenuItem>{" "}
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-red-600">
+                      <DropdownMenuItem className="text-red-600" onClick={() => deleteProduct(product._id.toString())}>
                         Remove Product
                       </DropdownMenuItem>
                     </DropdownMenuContent>

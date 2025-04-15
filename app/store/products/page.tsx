@@ -16,7 +16,6 @@ import { Filter, Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ObjectId } from "mongodb";
 import Loading from "@/components/loading";
-import { IOrderItem } from "@/models/Order";
 
 export interface IProduct extends Document {
   _id: ObjectId;
@@ -77,6 +76,42 @@ export default function StoreProductsPage() {
     setTargetProductId(id);
     setPriceUpdate(price);
   };
+
+  
+  const deleteProduct = async (id: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/product/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          csrfToken,
+        }),
+        redirect: "manual",
+      });
+
+      const data = await res.json();
+
+      // Cek apakah response adalah JSON
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Server returned an invalid response");
+      }
+
+      if (!res.ok) throw new Error(data.message || "Delete failed");
+    } catch (error: unknown) {
+      let errorMessage = "Internal Server Error";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      console.error("Update error :", error);
+    } finally {
+      window.location.reload();
+    }
+  }
+
 
   const handleUpdateStock = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -319,6 +354,7 @@ export default function StoreProductsPage() {
                 edit={edit}
                 updateStock={updateStock}
                 editPrice={editPrice}
+                deleteProduct={deleteProduct}
               />
             </TabsContent>
             <TabsContent value="in_stock">
@@ -328,6 +364,7 @@ export default function StoreProductsPage() {
                 edit={edit}
                 updateStock={updateStock}
                 editPrice={editPrice}
+                deleteProduct={deleteProduct}
               />
             </TabsContent>
             <TabsContent value="low_stock">
@@ -337,6 +374,7 @@ export default function StoreProductsPage() {
                 edit={edit}
                 updateStock={updateStock}
                 editPrice={editPrice}
+                deleteProduct={deleteProduct}
               />
             </TabsContent>
             <TabsContent value="out_of_stock">
@@ -346,6 +384,7 @@ export default function StoreProductsPage() {
                 edit={edit}
                 updateStock={updateStock}
                 editPrice={editPrice}
+                deleteProduct={deleteProduct}
               />
             </TabsContent>
           </Tabs>

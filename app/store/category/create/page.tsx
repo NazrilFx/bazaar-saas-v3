@@ -69,6 +69,8 @@ export default function SignupPage() {
       if (!res.ok) throw new Error(data.message || "Create failed");
 
       setMessage("New Category has been made");
+      setName("")
+      setDescription("")
     } catch (error: unknown) {
       let errorMessage = "Internal Server Error";
 

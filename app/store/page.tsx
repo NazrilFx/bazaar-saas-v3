@@ -210,95 +210,129 @@ export default function StoreDashboard() {
     }
   };
 
+  const deleteProduct = async (id: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/product/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          csrfToken,
+        }),
+        redirect: "manual",
+      });
+
+      const data = await res.json();
+
+      // Cek apakah response adalah JSON
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Server returned an invalid response");
+      }
+
+      if (!res.ok) throw new Error(data.message || "Delete failed");
+    } catch (error: unknown) {
+      let errorMessage = "Internal Server Error";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      console.error("Update error :", error);
+    } finally {
+      window.location.reload();
+    }
+  };
+
   if (loading) return <Loading />;
 
-    // Modal untuk update stock
-    if (modalStock) {
-      return (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-sm">
-            <h2 className="text-lg font-semibold mb-4">Update Stock</h2>
-            <form>
-              <input
-                type="number"
-                value={stockUpdate ?? ""}
-                onChange={(e) =>
-                  setStockUpdate(
-                    e.target.value === "" ? null : Number(e.target.value)
-                  )
-                }
-                placeholder="placeholder"
-                className="w-full px-4 py-2 border rounded-md mb-4 focus:outline-none focus:ring focus:ring-blue-300 bg-white"
-                required
-              />
-              <div className="flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setModalStock(false)}
-                  className="px-4 py-2 rounded-md bg-gray-300 hover:bg-gray-400 text-sm"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUpdateStock}
-                  type="submit"
-                  className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm"
-                >
-                  save
-                </button>
-              </div>
-            </form>
-          </div>
+  // Modal untuk update stock
+  if (modalStock) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+        <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-sm">
+          <h2 className="text-lg font-semibold mb-4">Update Stock</h2>
+          <form>
+            <input
+              type="number"
+              value={stockUpdate ?? ""}
+              onChange={(e) =>
+                setStockUpdate(
+                  e.target.value === "" ? null : Number(e.target.value)
+                )
+              }
+              placeholder="placeholder"
+              className="w-full px-4 py-2 border rounded-md mb-4 focus:outline-none focus:ring focus:ring-blue-300 bg-white"
+              required
+            />
+            <div className="flex justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setModalStock(false)}
+                className="px-4 py-2 rounded-md bg-gray-300 hover:bg-gray-400 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateStock}
+                type="submit"
+                className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm"
+              >
+                save
+              </button>
+            </div>
+          </form>
         </div>
-      );
-    }
-  
-    // Modal untuk update price
-    if (modalPrice) {
-      return (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-sm">
-            <h2 className="text-lg font-semibold mb-4">Update Price</h2>
-            <form>
-              <input
-                type="number"
-                value={priceUpdate ?? ""}
-                onChange={(e) =>
-                  setPriceUpdate(
-                    e.target.value === "" ? null : Number(e.target.value)
-                  )
-                }
-                placeholder="placeholder"
-                className="w-full px-4 py-2 border rounded-md mb-4 focus:outline-none focus:ring focus:ring-blue-300 bg-white"
-                required
-              />
-              {priceUpdate && (
-                <div className="text-sm my-2 bg-blue-50">
-                  Rp {new Intl.NumberFormat("id-ID").format(priceUpdate)}
-                </div>
-              )}
-              <div className="flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setModalPrice(false)}
-                  className="px-4 py-2 rounded-md bg-gray-300 hover:bg-gray-400 text-sm"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUpdatePrice}
-                  type="submit"
-                  className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm"
-                >
-                  save
-                </button>
+      </div>
+    );
+  }
+
+  // Modal untuk update price
+  if (modalPrice) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+        <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-sm">
+          <h2 className="text-lg font-semibold mb-4">Update Price</h2>
+          <form>
+            <input
+              type="number"
+              value={priceUpdate ?? ""}
+              onChange={(e) =>
+                setPriceUpdate(
+                  e.target.value === "" ? null : Number(e.target.value)
+                )
+              }
+              placeholder="placeholder"
+              className="w-full px-4 py-2 border rounded-md mb-4 focus:outline-none focus:ring focus:ring-blue-300 bg-white"
+              required
+            />
+            {priceUpdate && (
+              <div className="text-sm my-2 bg-blue-50">
+                Rp {new Intl.NumberFormat("id-ID").format(priceUpdate)}
               </div>
-            </form>
-          </div>
+            )}
+            <div className="flex justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setModalPrice(false)}
+                className="px-4 py-2 rounded-md bg-gray-300 hover:bg-gray-400 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdatePrice}
+                type="submit"
+                className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm"
+              >
+                save
+              </button>
+            </div>
+          </form>
         </div>
-      );
-    }
-  
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -445,11 +479,16 @@ export default function StoreDashboard() {
               edit={(id) => router.push(`/store/products/edit/${id}`)}
               updateStock={updateStock}
               editPrice={editPrice}
+              deleteProduct={deleteProduct}
             />
           </CardContent>
           <CardFooter>
-            <Button variant="outline" className="w-full" onClick={() => router.push("/store/products")}>
-              View All Products 
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => router.push("/store/products")}
+            >
+              View All Products
             </Button>
           </CardFooter>
         </Card>
