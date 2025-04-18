@@ -1,17 +1,25 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/dbConnect';
 import Category from '@/models/Category';
+import getCookieToken from '@/utils/getCookieToken';
 
 export async function POST(req: Request) {
   try {
     // Koneksi ke database
     await connectDB();
 
+    const csrfTokenFromCookie = getCookieToken(req, "csrf_token")
+
     // Ambil data dari form
     const formData = await req.formData();
     const id = formData.get("id") as string;
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
+    const csrfToken = formData.get("csrfToken") as string;
+
+    if (!csrfTokenFromCookie || !csrfToken || csrfTokenFromCookie !== csrfToken) {
+      return NextResponse.json({ message: "Invalid CSRF" }, { status: 403 });
+    }
 
     // Validasi jika id, name, atau description kosong
     if (!id || !name || !description) {

@@ -55,8 +55,6 @@ export async function GET(req: NextRequest) {
             "in_stock"
     }));
 
-    const orders = await Order.find({ store_id: storeId }).lean()
-
     const recentOrders = await Order.find({ store_id: storeId })
       .sort({ created_at: -1 }) // Urutkan dari yang terbaru (descending)
       .limit(4);

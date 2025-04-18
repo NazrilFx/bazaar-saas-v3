@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Loading from "@/components/loading";
 
 interface Category {
   _id: string;
@@ -15,6 +16,7 @@ export default function CategoryPage() {
   const [error, setError] = useState("");
   const [vendor, setVendor] = useState<boolean>(false);
   const [admin, setAdmin] = useState<boolean>(false);
+  const [csrfToken, setCsrfToken] = useState("")
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -32,11 +34,9 @@ export default function CategoryPage() {
           throw new Error(data.message || "Failed to fetch categories");
 
         if (resAdmin.ok) {
-          console.log(dataAdmin);
           setAdmin(dataAdmin.user == null ? false : true);
         } else {
-          console.log(dataAdmin);
-          throw new Error(data.message || "Failed to fetch admin");
+          setAdmin(false)
         }
 
         if (resVendor.ok) {
@@ -52,6 +52,10 @@ export default function CategoryPage() {
         setLoading(false);
       }
     };
+
+    fetch("/api/csrf")
+    .then((res) => res.json())
+    .then((data) => setCsrfToken(data.csrfToken));
 
     fetchCategories();
   }, []);
@@ -69,7 +73,7 @@ export default function CategoryPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id }), // Kirim ID di dalam body
+        body: JSON.stringify({ id, csrfToken }), // Kirim ID di dalam body
       });
 
       const data = await res.json();
@@ -81,7 +85,7 @@ export default function CategoryPage() {
     }
   };
 
-  if (loading) return <p>Loading categories...</p>;
+  if (loading) return <Loading/>
   if (error) return <p className="text-red-500">Error: {error}</p>;
   if (!vendor)
     return <p className="text-red-500">Only vendor can edit category</p>;
@@ -109,7 +113,7 @@ export default function CategoryPage() {
               <td className="border p-2">{category.description}</td>
               {admin && (
                 <td className="border p-2 flex space-x-2">
-                  <Link href={`category/edit/${category._id}`}>
+                  <Link href={`category/edit/${category._id}`} onClick={() => setLoading(true)}>
                     <button className="px-3 py-1 bg-yellow-500 text-white rounded-lg">
                       Edit
                     </button>

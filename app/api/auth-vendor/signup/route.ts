@@ -3,11 +3,17 @@ import bcrypt from "bcryptjs";
 import Vendor from "@/models/Vendor";
 import connectDB from "@/lib/dbConnect";
 import Activity from "@/models/Activity";
+import getCookieToken from "@/utils/getCookieToken";
 
 export async function POST(req: Request) {
   try {
     await connectDB();
-    const { name, email, description, business_type, contact_name, password, phone } = await req.json();
+    const { name, email, description, business_type, contact_name, password, phone, csrfToken } = await req.json();
+    const csrfTokenFromCookie = getCookieToken(req, "csrf_token");
+
+    if (!csrfTokenFromCookie || !csrfToken || csrfTokenFromCookie !== csrfToken) {
+      return NextResponse.json({ message: "Invalid CSRF" }, { status: 403 });
+    }
 
     // Cek apakah email sudah ada
     const existingUser = await Vendor.findOne({ email });

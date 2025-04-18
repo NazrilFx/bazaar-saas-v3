@@ -1,53 +1,60 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { cookies } from "next/headers";
-import Admin from "@/models/Admin";
-import connectDB from "@/lib/dbConnect";
+'use client'
 
-export default async function VendorDetailsPage({ params }: {params: Promise<{id : string}>}) {
-  await connectDB();
-  const cookieStore = await cookies();
-  const token = cookieStore.get("admin_token")?.value;
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 
-  if (!token) {
-    return <div>Unauthorized</div>;
-  }
+export default function EditCategoryPage() {
+  const [csrfToken, setCsrfToken] = useState('')
+  const [category, setCategory] = useState({ name: '', description: '' })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const params = useParams();
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+  const id = params.id;
 
-  const { id } = await params
-  
-  const csrfRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/csrf`, {
-    cache: "no-store",
-  });
-  
-  const dataCsrfRes = await csrfRes.json();
-  
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/category/${id}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'csrfToken': dataCsrfRes.csrfToken, // kirim token di header
-    },
-    cache: "no-store", // Hindari caching untuk mendapatkan data terbaru
-  });
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        // Ambil token CSRF
+        const csrfRes = await fetch("/api/csrf", {
+        })
+        if (!csrfRes.ok) throw new Error('Gagal ambil CSRF token')
+        const dataCsrfRes = await csrfRes.json()
+        setCsrfToken(dataCsrfRes.csrfToken)
 
-  if (!res.ok) {
-    return <p className="text-red-500">Failed to load category</p>;
-  }
+        // Ambil data kategori
+        const res = await fetch(`/api/category/${id}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'csrfToken': dataCsrfRes.csrfToken,
+          },
+          cache: 'no-store',
+        })
+        if (!res.ok) throw new Error('Gagal ambil data kategori')
+        const { category } = await res.json()
+        setCategory(category)
+      } catch (err: any) {
+        setError(err.message || 'Gagal mengambil data')
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  if (!csrfRes.ok) {
-    return <p className="text-red-500">Failed to load csrf token</p>;
-  }
+    fetchData()
+  }, [id])
 
-  if (!decoded.id) {
-    return <p className="text-red-500">You are not admin</p>;
-  }
-
-  const { category } = await res.json(); // ✅ Jangan lupa parse JSON
+  if (loading) return <p>Loading...</p>
+  if (error) return <p className="text-red-500">{error}</p>
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Edit Category</h1>
-      <form action={`${process.env.NEXT_PUBLIC_API_URL}/api/category/update`} method="POST" className="space-y-4">
+      <form
+        action={"/api/category/update"}
+        method="POST"
+        className="space-y-4"
+      >
+        <input type="hidden" name="csrfToken" value={csrfToken} />
         <input type="hidden" name="id" value={id} />
         <div>
           <label className="block text-gray-700">Category Name</label>
@@ -76,4 +83,3 @@ export default async function VendorDetailsPage({ params }: {params: Promise<{id
     </div>
   )
 }
-

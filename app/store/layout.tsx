@@ -76,6 +76,7 @@ export default function StoreLayout({
   const [store, setStore] = useState<IStore | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
+  const [event, setEvent] = useState("");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -86,8 +87,10 @@ export default function StoreLayout({
         if (res.ok) {
           setStore(data.store);
           setVendorName(data.vendor_name);
+          setEvent(data.event)
         } else {
           setStore(null);
+          setEvent("")
         }
 
       } catch (error) {
@@ -134,7 +137,7 @@ export default function StoreLayout({
       navItems={navItems}
       theme="store"
       title="Store Dashboard"
-      subtitle={`${store.name} at Summer Food Festival`}
+      subtitle={`${store.name} at ${event?? "-"}`}
       userRole={`Vendor ${vendorName}`}
       userName={store.name}
       logout="/api/auth-store/logout"

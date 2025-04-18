@@ -3,9 +3,14 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import Store from "@/models/Store";
 import Vendor from "@/models/Vendor"; // Import model Vendor
 import connectDB from "@/lib/dbConnect";
+import Event from "@/models/Event"
 
 export async function GET(req: NextRequest) {
   await connectDB();
+
+  const today = new Date();
+  const startOfThisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const endOfThisMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
 
   // Ambil token dari cookies
   const token = req.cookies.get("store_token")?.value;
@@ -19,6 +24,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ store: null, vendor_name: null }, { status: 401 });
     }
 
+    const storeId = decoded.id
+
+    const event = await Event.findOne({
+      created_at: { $gte: startOfThisMonth, $lte: endOfThisMonth },
+      storesId: { $in: storeId }
+    }).select("name").lean();
+
     // Ambil store dari database tanpa password_hash
     const store = await Store.findById(decoded.id).select("-password_hash");
 
@@ -28,7 +40,9 @@ export async function GET(req: NextRequest) {
     const vendor = await Vendor.findById(store.vendor_id).select("name").lean();
     const vendorName = vendor?.name || null;
 
-    return NextResponse.json({ store, vendor_name: vendorName });
+    return NextResponse.json({
+      store, vendor_name: vendorName, event: event?.name,
+    });
   } catch (error: unknown) {
     console.error("Login Error:", error);
     return NextResponse.json({ store: null, vendor_name: null }, { status: 401 });
