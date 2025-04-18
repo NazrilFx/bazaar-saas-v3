@@ -5,6 +5,7 @@ import Store from "@/models/Store";
 import Product from "@/models/Product";
 import Event from "@/models/Event";
 import Order from "@/models/Order";
+import { ObjectId } from "mongodb";
 
 export async function GET(req: NextRequest) {
     try {
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
                 if (!Array.isArray(event.storesId)) return false;
 
                 return event.storesId
-                    .map((id: any) => id?.toString?.())
+                    .map((id: ObjectId) => id?.toString?.())
                     .includes(storeIdStr);
             });
 

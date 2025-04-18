@@ -15,7 +15,6 @@ import {
   ArrowUpRight,
   CreditCard,
   DollarSign,
-  Package,
   Plus,
   ShoppingBag,
 } from "lucide-react";
@@ -155,7 +154,7 @@ export default function StoreDashboard() {
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      console.error("Update error :", error);
+      console.error("Update error :", errorMessage);
     } finally {
       setTargetProductId("");
       window.location.reload();
@@ -203,7 +202,7 @@ export default function StoreDashboard() {
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      console.error("Update error :", error);
+      console.error("Update error :", errorMessage);
     } finally {
       setTargetProductId("");
       window.location.reload();
@@ -238,7 +237,7 @@ export default function StoreDashboard() {
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      console.error("Update error :", error);
+      console.error("Update error :", errorMessage);
     } finally {
       window.location.reload();
     }

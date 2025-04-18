@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import Activity from "@/models/Activity";
 import Admin from "@/models/Admin";
 import Vendor from "@/models/Vendor";
@@ -6,7 +6,7 @@ import User from "@/models/User";
 import Store from "@/models/Store";
 import connectDB from "@/lib/dbConnect";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         await connectDB(); // Pastikan koneksi ke database
 

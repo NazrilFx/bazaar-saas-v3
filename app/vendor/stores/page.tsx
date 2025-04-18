@@ -12,7 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VendorStoresList } from "@/components/vendor/stores-list";
-import { IStore } from "@/models/Store";
 import { Filter, Plus, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { StoresWithBazarEvent } from "../page";

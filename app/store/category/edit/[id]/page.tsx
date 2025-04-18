@@ -33,8 +33,14 @@ export default function EditCategoryPage() {
         if (!res.ok) throw new Error('Gagal ambil data kategori')
         const { category } = await res.json()
         setCategory(category)
-      } catch (err: any) {
-        setError(err.message || 'Gagal mengambil data')
+      } catch (err: unknown) {
+        let errorMessage = "Internal Server Error";
+
+        if (err instanceof Error) {
+          errorMessage = err.message;
+        }
+
+        setError(errorMessage || 'Gagal mengambil data')
       } finally {
         setLoading(false)
       }

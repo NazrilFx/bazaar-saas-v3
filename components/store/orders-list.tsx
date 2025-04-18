@@ -246,15 +246,15 @@ export function StoreOrdersList({ status, orders }: StoreOrdersListProps) {
   )
 }
 
-function formatDate(dateString: string): string {
-  const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: "numeric" }
-  return new Date(dateString).toLocaleDateString("id-ID", options)
-}
+// function formatDate(dateString: string): string {
+//   const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: "numeric" }
+//   return new Date(dateString).toLocaleDateString("id-ID", options)
+// }
 
-function formatTime(timeString: string): string {
-  const [hours, minutes] = timeString.split(":")
-  const hour = Number.parseInt(hours, 10)
-  const suffix = hour < 12 ? "pagi" : hour < 15 ? "siang" : hour < 18 ? "sore" : "malam"
-  const hour12 = hour % 12 || 12
-  return `${hour12}.${minutes} ${suffix}`
-}
+// function formatTime(timeString: string): string {
+//   const [hours, minutes] = timeString.split(":")
+//   const hour = Number.parseInt(hours, 10)
+//   const suffix = hour < 12 ? "pagi" : hour < 15 ? "siang" : hour < 18 ? "sore" : "malam"
+//   const hour12 = hour % 12 || 12
+//   return `${hour12}.${minutes} ${suffix}`
+// }

@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import Vendor from "@/models/Vendor";
 import Store from "@/models/Store"; // pastikan model Store sudah ada dan benar
 import connectDB from "@/lib/dbConnect";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     await connectDB();
 
@@ -41,10 +41,14 @@ export async function GET(req: NextRequest) {
         },
       }
     );
-  } catch (error) {
-    console.error("Error fetching vendor status:", error);
+  } catch (error: unknown) {
+    let errorMessage = "Internal Server Error";
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
     return NextResponse.json(
-      { error: "Failed to fetch vendor status" },
+      { error: "Failed to fetch vendor status", message: errorMessage },
       { status: 500 }
     );
   }

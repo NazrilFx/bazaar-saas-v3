@@ -1,4 +1,29 @@
 import { NextResponse } from "next/server"
+import { IOrder, IOrderItem } from "@/models/Order"
+
+// export interface CleanIOrderItem {
+//     product_id: string;
+//     name: string;
+//     price: number;
+//     quantity: number;
+//     subtotal: number;
+// }
+
+// export interface CleanIOrder extends Document {
+//     store_id: string; // Referensi ke store
+//     midtrans_token: string
+//     customer_name: string;
+//     customer_email: string;
+//     order_number: number;
+//     status: "pending" | "paid" | "cancelled";
+//     items: CleanIOrderItem[];
+//     total_amount: number;
+//     tax_amount: number;
+//     payment_method: string,
+//     created_at: Date;
+//     updated_at: Date
+// }
+
 
 export async function POST(req: Request) {
   try {
@@ -9,12 +34,12 @@ export async function POST(req: Request) {
     }
 
     // Bersihkan ObjectId jadi string
-    const cleanOrders = orders.map((order: any) => {
+    const cleanOrders = orders.map((order: IOrder) => {
       const cleanOrder = {
         ...order,
         _id: order._id?.toString?.() || order._id,
         items: Array.isArray(order.items)
-          ? order.items.map((item: any) => ({
+          ? order.items.map((item: IOrderItem) => ({
               ...item,
               product_id: item.product_id?.toString?.() || item.product_id
             }))
@@ -27,7 +52,7 @@ export async function POST(req: Request) {
     const headers = Object.keys(cleanOrders[0])
     const csvRows = [
       headers.join(","),
-      ...cleanOrders.map((order: any) =>
+      ...cleanOrders.map((order: Record<string, any>) =>
         headers.map((key) => {
           const cell = order[key]
           const val = typeof cell === "object" ? JSON.stringify(cell) : cell
@@ -45,8 +70,13 @@ export async function POST(req: Request) {
         "Content-Disposition": `attachment; filename="orders-${Date.now()}.csv"`,
       },
     })
-  } catch (error) {
-    console.error("Error export csv:", error)
-    return NextResponse.json({ message: "Gagal export CSV" }, { status: 500 })
+  } catch (error: unknown) {
+    let errorMessage = "Internal Server Error";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+    console.error("Error export csv:", errorMessage)
+    return NextResponse.json({ message: errorMessage }, { status: 500 })
   }
 }

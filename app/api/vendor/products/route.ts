@@ -27,9 +27,9 @@ export async function GET(req: NextRequest) {
 
         const storesMap = new Map(stores.map(store => [store._id.toString(), store.name]));
 
-        const products = await Product.find({ store_id: { $in: stores } }).lean()
+        const products = await Product.find({ store_id: { $in: stores } }).select("-vendor_id").lean()
 
-        const formattedProducts = products.map(({ _id, category_id, store_id, vendor_id, ...product }) => ({
+        const formattedProducts = products.map(({ _id, category_id, store_id, ...product }) => ({
             ...product, // Spread semua data kecuali category_id
             id : _id.toString(),
             store: storesMap.get(store_id.toString()) || "Unknown",

@@ -85,7 +85,7 @@ export default function VendorManagement() {
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      console.error("Activate error:", error);
+      console.error("Activate error:", errorMessage);
     }
   };
 
@@ -114,7 +114,7 @@ export default function VendorManagement() {
       if (error instanceof Error) {
         errorMessage = error.message;
       }
-      console.error("Activate error:", error);
+      console.error("Activate error:", errorMessage);
     }
   };
 

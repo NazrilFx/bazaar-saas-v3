@@ -5,6 +5,23 @@ import Store from "@/models/Store";
 import Product from "@/models/Product";
 import Event from "@/models/Event";
 import Order from "@/models/Order";
+import { ObjectId } from "mongodb";
+import mongoose from "mongoose";
+
+export interface IEvent {
+    name: string;
+    description?: string;
+    start_date: Date;
+    end_date: Date;
+    location?: string;
+    created_by: string;
+    vendorsId?: mongoose.Types.ObjectId[];
+    storesId?: mongoose.Types.ObjectId[];
+    created_at: Date;
+    updated_at: Date;
+    storeThisEvent: number;
+    isActive: boolean
+}
 
 export async function GET(req: NextRequest) {
     try {
@@ -22,7 +39,7 @@ export async function GET(req: NextRequest) {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
         if (!decoded || typeof decoded === "string" || !decoded.id) {
             return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-        } 
+        }
 
         const vendorId = decoded.id;
 
@@ -61,7 +78,7 @@ export async function GET(req: NextRequest) {
                 if (!Array.isArray(event.storesId)) return false;
 
                 return event.storesId
-                    .map((id: any) => id?.toString?.())
+                    .map((id: ObjectId) => id?.toString?.())
                     .includes(storeIdStr);
             });
 
@@ -105,15 +122,18 @@ export async function GET(req: NextRequest) {
         })
             .sort({ start_date: 1 })
             .limit(3)
-            .lean();
+            .lean() as unknown as IEvent[] 
 
-        upcomingEvents.forEach((event: any) => {
-            const eventStoreIds = event.storesId.map((id: any) => id.toString());
-            const storeThisEvent = storeIdsString.filter(id => eventStoreIds.includes(id)).length;
+        upcomingEvents.forEach((event) => {
+            const typedEvent = event as IEvent;
 
-            event.storeThisEvent = storeThisEvent;
-            event.isActive = new Date(event.start_date) <= today; // true jika event sudah dimulai
+            const eventStoreIds = typedEvent.storesId?.map((id: ObjectId) => id.toString());
+            const storeThisEvent = storeIdsString.filter(id => eventStoreIds?.includes(id)).length;
+
+            typedEvent.storeThisEvent = storeThisEvent;
+            typedEvent.isActive = new Date(typedEvent.start_date) <= today;
         });
+
 
         // Hitung store vendor yang ikut event
         const storeIdsInEvents = await Event.distinct("storesId", {
