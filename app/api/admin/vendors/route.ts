@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import Vendor from "@/models/Vendor";
+import Vendor, { IVendor } from "@/models/Vendor";
 import Store from "@/models/Store"; // pastikan model Store sudah ada dan benar
 import connectDB from "@/lib/dbConnect";
 
@@ -12,7 +12,7 @@ export async function GET() {
     // Ambil semua store dan grupkan berdasarkan vendor_id
     const allStores = await Store.find({}).lean();
 
-    const getStoreCount = (vendors: any[]) =>
+    const getStoreCount = (vendors: IVendor[]) =>
       vendors.map((vendor) => {
         const storeCount = allStores.filter(
           (store) => store.vendor_id?.toString() === vendor._id.toString()

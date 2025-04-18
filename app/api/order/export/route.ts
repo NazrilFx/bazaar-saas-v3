@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     const headers = Object.keys(cleanOrders[0])
     const csvRows = [
       headers.join(","),
-      ...cleanOrders.map((order: Record<string, any>) =>
+      ...cleanOrders.map((order: Record<string, unknown>) =>
         headers.map((key) => {
           const cell = order[key]
           const val = typeof cell === "object" ? JSON.stringify(cell) : cell
