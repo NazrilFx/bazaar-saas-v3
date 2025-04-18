@@ -116,6 +116,7 @@ export function StorePOSInterface() {
   const [vendorEmail, setVendorEmail] = useState<string | null>(null);
   const [vendorPhone, setVendorPhone] = useState<string | null>(null);
   const [storeId, setStoreId] = useState("");
+  const [csrfToken, setCsrfToken] = useState("");
   // const [orderItems, setOrderItems] = useState<IOrderItem[] | []>([])
 
   useEffect(() => {
@@ -142,6 +143,10 @@ export function StorePOSInterface() {
     };
 
     loadSnapScript().catch((err) => console.error(err));
+
+    fetch("/api/csrf")
+    .then((res) => res.json())
+    .then((data) => setCsrfToken(data.csrfToken));
 
     fetchUser().then(() => {
       setLoading(false);
@@ -272,6 +277,7 @@ export function StorePOSInterface() {
           total_amount: total,
           tax_amount: tax,
           payment_method: "pending",
+          csrfToken
         }),
       });
 
@@ -313,6 +319,7 @@ export function StorePOSInterface() {
         body: JSON.stringify({
           id: dataOrder.order._id.toString(),
           midtrans_token: data.token,
+          csrfToken
         }),
       });
 
@@ -340,6 +347,7 @@ export function StorePOSInterface() {
                 id: dataOrder.order._id.toString(),
                 status,
                 payment_method: result.payment_type,
+                csrfToken
               }),
             });
 
@@ -369,6 +377,7 @@ export function StorePOSInterface() {
                 id: dataOrder.order._id.toString(),
                 status,
                 payment_method: result.payment_type,
+                csrfToken,
               }),
             });
 
@@ -398,6 +407,7 @@ export function StorePOSInterface() {
                 id: dataOrder.order._id.toString(),
                 status,
                 payment_method: result.payment_type,
+                csrfToken,
               }),
             });
 

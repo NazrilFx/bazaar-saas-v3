@@ -37,6 +37,11 @@ export default function PayPage() {
 
   const handlePay = async () => {
     try {
+      let csrfToken: string
+      await fetch("/api/csrf")
+      .then((res) => res.json())
+      .then((data) => csrfToken = data.csrfToken);
+
       window.snap.pay(token, {
         onSuccess: async (result) => {
             const status = mapMidtransStatusToAppStatus(
@@ -51,6 +56,7 @@ export default function PayPage() {
                   id,
                   status,
                   payment_method: result.payment_type,
+                  csrfToken,
                 }),
               });
   
