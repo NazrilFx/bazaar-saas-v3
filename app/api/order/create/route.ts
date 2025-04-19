@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Order from "@/models/Order"; // sesuaikan path import model Order
 import mongoose from "mongoose";
+import Activity from "@/models/Activity";
 
 export async function POST(req: NextRequest) {
     try {
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
         if (!items || !Array.isArray(items) || items.length === 0) {
             return NextResponse.json({ message: "Order items are required." }, { status: 400 });
         }
-        
+
         // Hitung order_number otomatis
         const lastOrder = await Order.findOne().sort({ order_number: -1 });
         const nextOrderNumber = lastOrder ? lastOrder.order_number + 1 : 1;
@@ -49,6 +50,16 @@ export async function POST(req: NextRequest) {
         });
 
         await newOrder.save();
+
+        const newActivity = new Activity({
+            user_id: store_id,
+            user_role: "store",
+            action: `${customer_name} user / store order ${items.length} items with a total of ${total_amount}`,
+            created_at: new Date(),
+        })
+
+        await newActivity.save()
+
 
         return NextResponse.json({ message: "Order created", order: newOrder }, { status: 201 });
     } catch (error) {

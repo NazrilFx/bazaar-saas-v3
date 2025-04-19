@@ -54,6 +54,8 @@ export default function SignupPage() {
           name,
           description,
           csrfToken,
+          storeName: store.name,
+          userId: store._id
         }),
         redirect: "manual",
       });

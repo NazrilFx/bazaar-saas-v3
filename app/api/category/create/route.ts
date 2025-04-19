@@ -2,12 +2,13 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/dbConnect";
 import Category from "@/models/Category";
 import getCookieToken from "@/utils/getCookieToken";
+import Activity from "@/models/Activity";
 
 export async function POST(req: Request) {
   try {
     await connectDB();
 
-    const { name, description, csrfToken } = await req.json();
+    const { name, description, csrfToken, userId, storeName } = await req.json();
 
     const csrfTokenFromCookie = getCookieToken(req, "csrf_token");
   
@@ -20,9 +21,20 @@ export async function POST(req: Request) {
         description,
         created_at: new Date(),
         updated_at: new Date(),
+
     });
           
     await newCategory.save();
+
+        const newActivity = new Activity({
+          user_id: userId,
+          user_role: "store",
+          action: `Category ${name} created with store ${storeName}`,
+          created_at: new Date(),
+        })
+    
+        await newActivity.save()
+    
 
     return NextResponse.json({ message: "Debug Success" });
     } catch (error: unknown) {
