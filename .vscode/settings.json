@@ -16,12 +16,7 @@
             "regex": ".*/store/.*",
             "color": "#FF9800"
         },
-    ],
-    "workbench.colorCustomizations": {
-        "tab.activeBorder": "#FF9800",
-        "statusBar.background": "#FF9800",
-        "statusBar.foreground": "#000000"
-    }
+    ]
 }
 
 // Biru : #007ACC
