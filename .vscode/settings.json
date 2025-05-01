@@ -1,6 +1,30 @@
 {
+    "colorTabs.config": [
+        {
+            "regex": ".*/admin/.*",
+            "color": "#007ACC"
+        },
+        {
+            "regex": ".*/vendor/.*",
+            "color": "#ffffff"
+        },
+        {
+            "regex": ".*/pos/.*",
+            "color": "#4CAF50"
+        },
+        {
+            "regex": ".*/store/.*",
+            "color": "#FF9800"
+        },
+    ],
     "workbench.colorCustomizations": {
-        "minimap.background": "#00000000",
-        "scrollbar.shadow": "#00000000"
+        "tab.activeBorder": "#FF9800",
+        "statusBar.background": "#FF9800",
+        "statusBar.foreground": "#000000"
     }
 }
+
+// Biru : #007ACC
+// Putih : #00BCD4
+// Orange : #FF9800
+// Hijau : #4CAF50

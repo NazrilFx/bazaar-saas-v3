@@ -257,7 +257,7 @@ export function StorePOSInterface() {
       .map((item) => ({
         product_id: item.id.toString(),
         name: item.name,
-        quantity: item.quantity,
+        quantity: item.quantity, 
         price: item.price,
       }));
 
@@ -270,7 +270,7 @@ export function StorePOSInterface() {
         body: JSON.stringify({
           store_id: storeId,
           customer_name: storeName,
-          midtrans_token: "pending",
+          midtrans_token: "pending", 
           customer_email: vendorEmail,
           status: "pending",
           items: filteredOrderItems,
